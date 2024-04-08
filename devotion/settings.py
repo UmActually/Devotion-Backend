@@ -50,7 +50,8 @@ def env_variable(name: str) -> str:
 SECRET_KEY = env_variable("SECRET_KEY")
 
 ALLOWED_HOSTS = [
-    "localhost"
+    "localhost",
+    ".vercel.app",
 ]
 
 # Application definition
@@ -96,7 +97,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'devotion.wsgi.application'
+WSGI_APPLICATION = 'devotion.wsgi.app'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
