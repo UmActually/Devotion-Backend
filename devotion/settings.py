@@ -12,7 +12,16 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+from datetime import timedelta
+import oracledb
 
+
+# Cositas de config extras
+TEST_DATABASE = True
+ORACLE_THICK_MODE = False
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,13 +49,9 @@ def env_variable(name: str) -> str:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env_variable("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = [
     "localhost"
 ]
-
 
 # Application definition
 
@@ -93,7 +98,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'devotion.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -103,9 +107,15 @@ DATABASES = {
         'NAME': env_variable("DB_NAME"),
         "USER": env_variable("DB_USER"),
         "PASSWORD": env_variable("DB_PASSWORD")
+    } if not TEST_DATABASE else {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": env_variable("TEST_DB_HOST"),
+        "PORT": "5432",
+        "NAME": env_variable("TEST_DB_NAME"),
+        "USER": env_variable("TEST_DB_USER"),
+        "PASSWORD": env_variable("TEST_DB_PASSWORD")
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -125,6 +135,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Token authentication
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -136,7 +159,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -150,3 +172,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = "users.User"
+
+if ORACLE_THICK_MODE:
+    oracle_lib_dir = "/opt/homebrew/opt/instantclient-sqlplus/19.8.0.0.0dbru"
+    if not os.path.exists(oracle_lib_dir):
+        oracle_lib_dir = None
+    oracledb.init_oracle_client(lib_dir=oracle_lib_dir)

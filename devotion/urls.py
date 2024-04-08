@@ -16,7 +16,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+import users.views as users
+import projects.views as projects
+import tasks.views as tasks
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+
+    path("login/", TokenObtainPairView.as_view()),
+    path("login/refresh/", TokenRefreshView.as_view()),
+    path("test/", users.test),
+    path("users/", users.create_user),
+    path("me/", users.CurrentUserView.as_view()),
+    path("me/projects/", users.get_current_user_projects),
+
+    path("projects/", projects.create_project),
+    path("projects/<uuid:project_id>/", projects.ProjectView.as_view()),
+    path("projects/<uuid:project_id>/subtasks/", projects.get_all_subtree_tasks),
+
+    path("tasks/", tasks.create_task),
+    path("tasks/<uuid:task_id>/", tasks.TaskView.as_view()),
+    path("tasks/<uuid:task_id>/status/", tasks.update_task_status),
+    path("tasks/<uuid:task_id>/subtasks/", tasks.get_all_subtree_tasks),
 ]

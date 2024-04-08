@@ -1,3 +1,103 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
+from .models import Project
+from .serializers import ProjectSerializer, ProjectDeserializer
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_project(request: Request) -> Response:
+    """
+    Crea un proyecto.
+
+    Campos:
+    - name
+    - description
+    - parent (opcional)
+    - leaders
+    - members
+    """
+    data = request.data
+    serializer = ProjectDeserializer(data=data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # TODO: Validar, si es un subproyecto, que el usuario sea líder
+
+    new_project = serializer.save()
+    serializer = ProjectSerializer(new_project)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ProjectView(APIView):
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return []
+        return [IsAuthenticated()]
+
+    def get(self, _request: Request, project_id: str) -> Response:
+        """Obtiene la información de un proyecto."""
+        try:
+            project = Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # TODO: Este endpoint dará un json grandotote con toda la
+        #  información necesaria para la vista
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request: Request, project_id: str) -> Response:
+        """Actualiza la información de un proyecto."""
+        try:
+            project = Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user not in project.leaders.all():
+            return Response(
+                {"message": "You are not a leader of this project"},
+                status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectDeserializer(request.data, instance=project)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        project = serializer.save()
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request: Request, project_id: str) -> Response:
+        """Elimina un proyecto."""
+        try:
+            project = Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user not in project.leaders.all():
+            return Response(
+                {"message": "You are not a leader of this project"},
+                status=status.HTTP_403_FORBIDDEN)
+
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
+    """Obtiene todas las tareas de un proyecto y sus subproyectos."""
+    try:
+        Project.objects.get(id=project_id)
+    except Project.DoesNotExist:
+        return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # TODO: Query bien hermoso para buscar en todo el
+    #  subárbol de tareas
+    return Response([], status=status.HTTP_200_OK)
