@@ -130,12 +130,12 @@ def update_task_status(request: Request, task_id: str) -> Response:
 
 
 @api_view(["GET"])
-def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
+def get_all_subtree_tasks(_request: Request, task_id: str) -> Response:
     """Obtiene todas las subtareas de una tarea."""
     try:
-        Task.objects.get(id=project_id)
+        Task.objects.get(id=task_id)
     except Task.DoesNotExist:
-        return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
     # TODO: Query bien hermoso para buscar en todo el
     #  subárbol de tareas parte 2
