@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from time import sleep
 import requests
 
@@ -25,6 +26,20 @@ def email_from_name(first: str, last: str, attempt: int = 1) -> str:
     first = acentoless(first).split(" ")[0]
     last = acentoless(last).split(" ")[0]
     return f"{first}{last}{'' if attempt == 1 else attempt}@example.com"
+
+
+def login(email: str, password: str) -> str:
+    endpoint = "login/"
+
+    r = requests.post(BASE_URL + endpoint, data={
+        "email": email,
+        "password": password
+    })
+
+    if not r:
+        raise HTTPException(r)
+
+    return r.json()["access"]
 
 
 def create_user(first_names: str, last_names: str, email: str | None = None) -> tuple[str, str]:
@@ -74,11 +89,17 @@ def create_project(
     return json["id"]
 
 
+def create_project_(
+        user_token: str, name: str, description: str, leaders: list[str],
+        members: list[str], parent: str | None = None) -> str:
+    return str(uuid.uuid4())
+
+
 def create_task(
         user_token: str, name: str, description: str, parent_project: str,
         asignee: str, due_date: datetime.date, start_date: datetime.date | None = None,
         parent_task: str | None = None, priority: int | None = None) -> str:
-    endpoint = "projects/"
+    endpoint = "tasks/"
 
     r = requests.post(BASE_URL + endpoint, headers={
         "Authorization": "Bearer " + user_token
@@ -98,3 +119,10 @@ def create_task(
 
     json = r.json()
     return json["id"]
+
+
+def create_task_(
+        user_token: str, name: str, description: str, parent_project: str,
+        asignee: str, due_date: datetime.date, start_date: datetime.date | None = None,
+        parent_task: str | None = None, priority: int | None = None) -> str:
+    return str(uuid.uuid4())

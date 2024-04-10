@@ -1,0 +1,476 @@
+{
+  "users": [
+    [
+      "14546b18-66f8-4b92-be71-629e1b85743e",
+      "Sergio P\u00e9rez"
+    ],
+    [
+      "0fe61d2f-9d7f-44b7-8d4c-67e6b5e36b03",
+      "Lewis Hamilton"
+    ],
+    [
+      "7fe38535-75ff-424c-8b53-31767b0ab33d",
+      "Max Verstappen"
+    ],
+    [
+      "72cbcb59-91e3-453a-92d2-11cda449a441",
+      "Valtteri Bottas"
+    ],
+    [
+      "e6285ac0-f578-4238-a5cd-3108929c5ab7",
+      "Charles Leclerc"
+    ],
+    [
+      "c3504730-0681-48ba-aa63-25330a33ac0b",
+      "Daniel Ricciardo"
+    ],
+    [
+      "558cf4e6-ef2d-403f-adfb-2a15d5353de8",
+      "Carlos Sainz"
+    ],
+    [
+      "48ce3e8e-5294-4244-8904-2633878ab649",
+      "Lando Norris"
+    ],
+    [
+      "dc67f26b-d85a-463c-9c5e-2783d6a70d8d",
+      "Fernando Alonso"
+    ],
+    [
+      "6c3973cf-4425-44ef-9095-c6d4ecd1627c",
+      "Esteban Ocon"
+    ],
+    [
+      "15c457a2-abf2-4c82-9f47-88677ae6dc2f",
+      "Pierre Gasly"
+    ],
+    [
+      "dd39f1e2-97af-4682-a7a7-272443557a03",
+      "Sebastian Vettel"
+    ],
+    [
+      "c7dbe1a6-fda7-4a27-8db4-bccc536d527c",
+      "Lance Stroll"
+    ],
+    [
+      "764a0383-d2bb-437f-b67e-1560e38716cc",
+      "Yuki Tsunoda"
+    ],
+    [
+      "59579d2e-0e42-449f-876a-62661cbe4f77",
+      "Kimi R\u00e4ikk\u00f6nen"
+    ],
+    [
+      "0202392a-c843-4d49-af14-1cadcd9f2ab9",
+      "Antonio Giovinazzi"
+    ],
+    [
+      "f75d41c7-5704-4397-84a6-902084d1e3d2",
+      "Nicholas Latifi"
+    ],
+    [
+      "99924b85-635f-4621-a9d7-3666e7f86999",
+      "Mick Schumacher"
+    ],
+    [
+      "33ca620d-ea71-4c46-a78b-bd290117f123",
+      "Nikita Mazepin"
+    ],
+    [
+      "98a3d2ba-f3dc-4f18-a56c-ab593752c5ab",
+      "George Russell"
+    ],
+    [
+      "f451d008-e9c8-4e82-8171-10a74ce3efea",
+      "Robert Kubica"
+    ],
+    [
+      "ca850f87-3e0b-495e-9bec-a6853192b5b5",
+      "Alexander Albon"
+    ],
+    [
+      "ab67c7a3-debe-40d8-812c-14817f77cce5",
+      "Pietro Fittipaldi"
+    ],
+    [
+      "5b29a84a-f69e-4e63-9ca1-f0cddd2fb64b",
+      "Guanyu Zhou"
+    ],
+    [
+      "86d1094a-dbf8-4f37-9ac1-414f1719a95c",
+      "Callum Ilott"
+    ],
+    [
+      "9e14581f-d70d-4ee3-b5f5-31e02df0a580",
+      "Nyck de Vries"
+    ],
+    [
+      "8d8c121f-b044-4c6a-a1d3-d5bfa3ae7f7b",
+      "Stoffel Vandoorne"
+    ],
+    [
+      "5c1e9d20-1ca7-4a7c-acc2-57056f7d09d7",
+      "Robert Shwartzman"
+    ],
+    [
+      "dc01dfa0-34be-4c21-b93a-b0e8b4c6887d",
+      "Jack Aitken"
+    ],
+    [
+      "58961177-b439-4511-9ed6-6151130c722e",
+      "Dan Ticktum"
+    ]
+  ],
+  "projects": [
+    [
+      "687bf2ab-ef33-4a66-868d-2762fd75184f",
+      "FSAE 2024"
+    ],
+    [
+      "af880a5e-d79f-4510-8b97-dbf52035d8f1",
+      "Chasis"
+    ],
+    [
+      "cbf39c5e-06d7-4d4a-927c-a3c5348bc0a3",
+      "Cockpit"
+    ],
+    [
+      "7440660e-9d16-43b6-acd0-ccb092d0373c",
+      "Aler\u00f3n trasero"
+    ],
+    [
+      "7ee1524b-a361-4c3f-ba40-17f38963f631",
+      "Direcci\u00f3n"
+    ],
+    [
+      "fd9c8d96-6ea4-44c5-ab86-4d555d944f03",
+      "Diferencial"
+    ],
+    [
+      "dbd71036-ab51-4814-bdf2-8e699bfc1554",
+      "Electr\u00f3nica"
+    ],
+    [
+      "0e662b3e-52f5-4fe5-81ed-640db5c0be07",
+      "Suspensi\u00f3n"
+    ],
+    [
+      "5d14cbcc-0bcf-4287-8837-0fe0b4152148",
+      "Finanzas"
+    ],
+    [
+      "b219f393-2d8a-4525-8515-9a718789d177",
+      "Eventos"
+    ],
+    [
+      "e515ba15-1a0b-4072-bc03-306d7404756e",
+      "Marketing"
+    ],
+    [
+      "ffc31d38-1e3c-4270-9f1a-e872f7b65e42",
+      "Rebranding de FSAE"
+    ],
+    [
+      "1bf38356-0a54-44cc-b340-d5a4bba21530",
+      "Motor"
+    ],
+    [
+      "88166fd7-e8da-4e7e-8022-cefb831c69be",
+      "Proveedores"
+    ]
+  ],
+  "tasks": [
+    [
+      "71055441-c326-4883-abb3-2dc9c49a338c",
+      "Mejoras en el sistema de frenado"
+    ],
+    [
+      "d32e5a0d-a89d-4471-87a7-a8fd33f93472",
+      "Dise\u00f1o y pruebas de neum\u00e1ticos"
+    ],
+    [
+      "d8f074cb-e420-4800-8dc5-7c44ffcfde67",
+      "Dise\u00f1o y componentes"
+    ],
+    [
+      "7d6917d5-68fa-4ee4-a6e1-835900afd935",
+      "Dise\u00f1o del chasis"
+    ],
+    [
+      "82de60ed-89ad-4d39-84f0-a48bda960ba2",
+      "Investigaci\u00f3n de nuevos materiales para la construcci\u00f3n del chasis"
+    ],
+    [
+      "33ce22a2-dcce-41b4-ae87-d5530edd24b4",
+      "Fabricaci\u00f3n de componentes de fibra de carbono"
+    ],
+    [
+      "4f4d6eec-38c5-4330-847c-2d6c2bb560af",
+      "Peso y distribuci\u00f3n"
+    ],
+    [
+      "3aa92cc8-b1f5-4809-9c96-215dd5dd6d23",
+      "Optimizaci\u00f3n del peso del veh\u00edculo"
+    ],
+    [
+      "98c0f0b7-4fc8-4ce6-8e84-fd51e44176a1",
+      "Optimizaci\u00f3n de la distribuci\u00f3n de peso"
+    ],
+    [
+      "002bbe11-a816-4dfd-8e6e-8c06eb86af86",
+      "Aerodin\u00e1mica"
+    ],
+    [
+      "c53af186-d670-4d48-8c29-812910b1f34b",
+      "Investigaci\u00f3n de aerodin\u00e1mica"
+    ],
+    [
+      "fd61c202-541a-4283-9f61-7f0c0b2f6b33",
+      "Investigaci\u00f3n de mejoras aerodin\u00e1micas"
+    ],
+    [
+      "b9cc3140-1b07-4670-9a02-e0c4c06bf6c5",
+      "Estudio de la aerodin\u00e1mica en condiciones de lluvia"
+    ],
+    [
+      "77ffba46-4d8c-4216-94e0-9194c212218e",
+      "Pruebas de rendimiento en t\u00fanel de viento"
+    ],
+    [
+      "a69c1354-6009-4308-a891-fdcae72fe0dc",
+      "Pruebas"
+    ],
+    [
+      "53b30c31-d838-489f-ad1c-310b20b391ef",
+      "Pruebas de choque"
+    ],
+    [
+      "01aa2cf6-6814-44e7-98a5-635bfb99e50b",
+      "Pruebas de resistencia del chasis"
+    ],
+    [
+      "0e09645d-4306-4c5c-be4e-765eb78c3864",
+      "Pruebas de resistencia de los materiales"
+    ],
+    [
+      "87a94379-99df-4045-851b-c621f20cb173",
+      "Dise\u00f1o del cockpit"
+    ],
+    [
+      "d70669d9-4f42-47b0-888f-584a3771248a",
+      "Investigaci\u00f3n de la ergonom\u00eda del cockpit"
+    ],
+    [
+      "fc07fa33-eb88-4492-ab18-25fac1cf537d",
+      "Pruebas de ergonom\u00eda del cockpit"
+    ],
+    [
+      "f2ab8976-4ff7-40ea-8e59-c087560da30a",
+      "DRS"
+    ],
+    [
+      "81b27ad0-1e74-4e05-b4c3-91e4168da959",
+      "Desarrollo del sistema de direcci\u00f3n"
+    ],
+    [
+      "59aa2c9d-7541-426b-b732-1c128ac5caae",
+      "Pruebas de rendimiento en pista"
+    ],
+    [
+      "64611c17-d1a9-4e6f-be34-34c3730844df",
+      "Investigaci\u00f3n de tecnolog\u00eda de diferencial"
+    ],
+    [
+      "5c9f2440-f11b-4095-8c14-c57ce8fdc6ef",
+      "Evaluaci\u00f3n de sistemas de diferencial"
+    ],
+    [
+      "262235e1-2cdc-4600-be02-c86c356d6156",
+      "Sistema de gesti\u00f3n del motor"
+    ],
+    [
+      "ed6dc05b-0b3a-4170-ba7f-998aa4896490",
+      "Selecci\u00f3n de motor"
+    ],
+    [
+      "644d8173-5819-4b8c-915e-a5e1ceca8c4f",
+      "An\u00e1lisis de rendimiento del motor"
+    ],
+    [
+      "3b853f4f-99b3-4883-bc8b-c369bd0c1fb2",
+      "Configuraci\u00f3n del sistema de gesti\u00f3n del motor"
+    ],
+    [
+      "d7910e25-0144-4cde-bc19-8e45be1ea432",
+      "Sistema de telemetr\u00eda"
+    ],
+    [
+      "086abb4a-321e-42dc-b7b7-95119eea68d6",
+      "Dise\u00f1o y configuraci\u00f3n del sistema de telemetr\u00eda"
+    ],
+    [
+      "61831462-d82e-41c9-89f9-54707f21e182",
+      "Programaci\u00f3n del software de telemetr\u00eda"
+    ],
+    [
+      "2bbf81a9-0e7e-4f21-9f2d-83bcc34a3455",
+      "An\u00e1lisis de datos de rendimiento en pista"
+    ],
+    [
+      "5c2dc9ec-5efd-464f-ba4d-c821177c8633",
+      "Sistema de control de tracci\u00f3n"
+    ],
+    [
+      "f626606b-5749-4ae0-9f30-78ffe0c8024e",
+      "Investigaci\u00f3n de tecnolog\u00eda de control de tracci\u00f3n"
+    ],
+    [
+      "b89afffb-6eb2-48bd-ac1d-454d292d198b",
+      "Instalaci\u00f3n de sistemas de control de tracci\u00f3n"
+    ],
+    [
+      "c2b7be8a-602f-4304-9ed6-801ef600883c",
+      "Sistema de control de estabilidad"
+    ],
+    [
+      "1e757088-3c57-4460-9b31-139a1367e6e4",
+      "Investigaci\u00f3n de tecnolog\u00eda de control de estabilidad"
+    ],
+    [
+      "48ecbd64-2da1-4e07-8567-07e69c6d13ab",
+      "Implementaci\u00f3n de sistemas de control de estabilidad"
+    ],
+    [
+      "e8448cee-7259-438a-8303-b2bbb1aa3fe3",
+      "Sistema de detecci\u00f3n de fallos"
+    ],
+    [
+      "bb358930-af65-4dbb-b3db-847490c55f9d",
+      "Investigaci\u00f3n de sistemas de detecci\u00f3n de fallos"
+    ],
+    [
+      "428ac2af-10f6-4ce2-af99-295322a79d71",
+      "Evaluaci\u00f3n de sistemas de detecci\u00f3n de fallos"
+    ],
+    [
+      "c273aef9-b310-447c-b2e0-865f7c5bbf7b",
+      "Sistema de diagn\u00f3stico de aver\u00edas"
+    ],
+    [
+      "40559631-364e-40bb-9778-ba9fb1a8e2b2",
+      "Investigaci\u00f3n de sistemas de diagn\u00f3stico de aver\u00edas"
+    ],
+    [
+      "b5ef6d5f-b28c-447f-8b19-d48dca13d4bb",
+      "Evaluaci\u00f3n de sistemas de diagn\u00f3stico de aver\u00edas"
+    ],
+    [
+      "a44427c4-7015-48e4-9dd0-3de7b7ac800f",
+      "Dise\u00f1o de la suspensi\u00f3n"
+    ],
+    [
+      "7fdca654-fb0f-4c92-b553-5826766638ea",
+      "Investigaci\u00f3n de suspensi\u00f3n"
+    ],
+    [
+      "c2a1e727-23b2-4a78-908b-59efe59872e7",
+      "Optimizaci\u00f3n de la geometr\u00eda de la suspensi\u00f3n"
+    ],
+    [
+      "fbfeda85-df33-432d-8de0-1cab39352dad",
+      "Configuraci\u00f3n de la suspensi\u00f3n"
+    ],
+    [
+      "99a40007-40da-4908-8383-65569a566357",
+      "Configuraci\u00f3n de la suspensi\u00f3n delantera"
+    ],
+    [
+      "6a11a363-de9c-4057-9c85-7033de3dac40",
+      "Configuraci\u00f3n de la suspensi\u00f3n trasera"
+    ],
+    [
+      "cf6adfa1-4502-4341-a91c-5e615cf0846f",
+      "Pruebas de rendimiento en pista"
+    ],
+    [
+      "63191c22-3960-4504-9308-c33fde222803",
+      "Simulaciones de rendimiento en pista"
+    ],
+    [
+      "c4020994-3e1e-45df-9c1e-bfba54fad4f6",
+      "Pruebas de rendimiento en pista"
+    ],
+    [
+      "c8be0e77-4faa-4560-b2a0-abcdc80d58a7",
+      "Pruebas de fiabilidad del sistema de transmisi\u00f3n"
+    ],
+    [
+      "3168412b-b30b-4508-9ca9-be8402ddd96c",
+      "Optimizaci\u00f3n de la geometr\u00eda de la suspensi\u00f3n"
+    ],
+    [
+      "ac3c8f80-d3ec-4eae-bc24-63af846722f2",
+      "Planificaci\u00f3n financiera"
+    ],
+    [
+      "5ee7f4dd-b960-4ea6-8870-7565bfbe16c7",
+      "Presupuesto"
+    ],
+    [
+      "0ec37afe-faf5-4062-a90a-52289812aa7f",
+      "Financiaci\u00f3n"
+    ],
+    [
+      "2e4e6b79-4707-4593-ac2c-8a1abdfbb29d",
+      "Ingresos y gastos"
+    ],
+    [
+      "6c640311-d39e-4877-be1e-3e217aabce86",
+      "Gesti\u00f3n de patrocinios"
+    ],
+    [
+      "0ad48350-682c-4a96-b571-7c5e3be695de",
+      "Gesti\u00f3n de patrocinios y relaciones p\u00fablicas"
+    ],
+    [
+      "6a999b67-4bdd-46a7-88b8-6d976b86d480",
+      "Investigaci\u00f3n de patrocinadores"
+    ],
+    [
+      "4eb84230-45a5-4d83-bbfa-12f4b9f872f3",
+      "Organizaci\u00f3n de eventos de presentaci\u00f3n"
+    ],
+    [
+      "be451a4c-167f-43e7-a20d-8ccc9e48e522",
+      "Organizaci\u00f3n de eventos de recaudaci\u00f3n de fondos"
+    ],
+    [
+      "a3fa1915-d756-4ce9-b366-6a63514fb433",
+      "Manual de identidad corporativa"
+    ],
+    [
+      "52054c23-5fc5-4040-addb-3f3e830ed5cc",
+      "Evaluaci\u00f3n de proveedores de componentes"
+    ],
+    [
+      "58440444-88dc-46c1-8f42-501a8503b00d",
+      "Junta de patrocinadores"
+    ],
+    [
+      "fb807cb4-42e1-4d81-9bd9-a4b695c6ba28",
+      "Combustible y lubricantes"
+    ],
+    [
+      "0971a347-7783-4af0-bb57-ae305ba42118",
+      "Investigaci\u00f3n de combustible y lubricantes"
+    ],
+    [
+      "2d8c1a93-050a-43f8-aa5a-e066e8f070c6",
+      "An\u00e1lisis de datos de consumo de combustible"
+    ],
+    [
+      "ec6c12f4-0140-478d-920c-c96d03dd1dfe",
+      "Configuraci\u00f3n del sistema de escape"
+    ]
+  ]
+}

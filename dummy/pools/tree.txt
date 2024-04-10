@@ -1,0 +1,87 @@
+[FSAE 2024]
+    [Chasis]
+        Mejoras en el sistema de frenado
+        Diseño y pruebas de neumáticos
+        Diseño y componentes
+            Diseño del chasis
+            Investigación de nuevos materiales para la construcción del chasis
+            Fabricación de componentes de fibra de carbono
+        Peso y distribución
+            Optimización del peso del vehículo
+            Optimización de la distribución de peso
+        Aerodinámica
+            Investigación de aerodinámica
+            Investigación de mejoras aerodinámicas
+            Estudio de la aerodinámica en condiciones de lluvia
+            Pruebas de rendimiento en túnel de viento
+        Pruebas
+            Pruebas de choque
+            Pruebas de resistencia del chasis
+            Pruebas de resistencia de los materiales
+        [Cockpit]
+            Diseño del cockpit
+                Investigación de la ergonomía del cockpit
+                Pruebas de ergonomía del cockpit
+        [Alerón trasero]
+            DRS
+        [Dirección]
+            Desarrollo del sistema de dirección
+            Pruebas de rendimiento en pista
+            [Diferencial]
+                Investigación de tecnología de diferencial
+                Evaluación de sistemas de diferencial
+    [Electrónica]
+        Sistema de gestión del motor
+            Selección de motor
+            Análisis de rendimiento del motor
+            Configuración del sistema de gestión del motor
+        Sistema de telemetría
+            Diseño y configuración del sistema de telemetría
+            Programación del software de telemetría
+            Análisis de datos de rendimiento en pista
+        Sistema de control de tracción
+            Investigación de tecnología de control de tracción
+            Instalación de sistemas de control de tracción
+        Sistema de control de estabilidad
+            Investigación de tecnología de control de estabilidad
+            Implementación de sistemas de control de estabilidad
+        Sistema de detección de fallos
+            Investigación de sistemas de detección de fallos
+            Evaluación de sistemas de detección de fallos
+        Sistema de diagnóstico de averías
+            Investigación de sistemas de diagnóstico de averías
+            Evaluación de sistemas de diagnóstico de averías
+    [Suspensión]
+        Diseño de la suspensión
+            Investigación de suspensión
+            Optimización de la geometría de la suspensión
+        Configuración de la suspensión
+            Configuración de la suspensión delantera
+            Configuración de la suspensión trasera
+        Pruebas de rendimiento en pista
+            Simulaciones de rendimiento en pista
+            Pruebas de rendimiento en pista
+        Pruebas de fiabilidad del sistema de transmisión
+        Optimización de la geometría de la suspensión
+    [Finanzas]
+        Planificación financiera
+            Presupuesto
+            Financiación
+            Ingresos y gastos
+        Gestión de patrocinios
+            Gestión de patrocinios y relaciones públicas
+            Investigación de patrocinadores
+        [Eventos]
+            Organización de eventos de presentación
+            Organización de eventos de recaudación de fondos
+    [Marketing]
+        [Rebranding de FSAE]
+            Manual de identidad corporativa
+    [Motor]
+        [Proveedores]
+            Evaluación de proveedores de componentes
+            Junta de patrocinadores
+        Combustible y lubricantes
+            Investigación de combustible y lubricantes
+            Análisis de datos de consumo de combustible
+        Configuración del sistema de escape
