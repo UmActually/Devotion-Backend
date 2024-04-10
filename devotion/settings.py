@@ -18,7 +18,7 @@ import oracledb
 
 # Cositas de config extras
 TEST_DATABASE = True
-ORACLE_THICK_MODE = False
+ORACLE_THICK_MODE = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -97,7 +97,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'devotion.wsgi.app'
+WSGI_APPLICATION = 'devotion.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -175,7 +175,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.User"
 
 if ORACLE_THICK_MODE:
-    oracle_lib_dir = "/opt/homebrew/opt/instantclient-sqlplus/19.8.0.0.0dbru"
+    oracle_lib_dir = "/opt/homebrew/opt/instantclient-sqlplus/19.8.0.0.0dbru/lib"
     if not os.path.exists(oracle_lib_dir):
         oracle_lib_dir = None
     oracledb.init_oracle_client(lib_dir=oracle_lib_dir)
