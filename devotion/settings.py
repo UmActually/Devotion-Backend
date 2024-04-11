@@ -17,7 +17,7 @@ import oracledb
 
 
 # Cositas de config extras
-TEST_DATABASE = True
+TEST_DATABASE = False
 ORACLE_THICK_MODE = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -175,7 +175,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.User"
 
 if ORACLE_THICK_MODE:
-    oracle_lib_dir = "/opt/homebrew/opt/instantclient-sqlplus/19.8.0.0.0dbru/lib"
+    oracle_lib_dir = "/lib/oracle/21/client64/lib"
     if not os.path.exists(oracle_lib_dir):
         oracle_lib_dir = None
     oracledb.init_oracle_client(lib_dir=oracle_lib_dir)
