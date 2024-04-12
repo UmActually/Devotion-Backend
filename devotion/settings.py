@@ -17,8 +17,10 @@ import oracledb
 
 
 # Cositas de config extras
+ORACLE_LIB_DIR = "/app/vendor/oracle/instantclient_19_22"
 TEST_DATABASE = False
-ORACLE_THICK_MODE = True
+ORACLE_THICK_MODE = False
+DEFAULT_LIB_DIR = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -51,7 +53,9 @@ SECRET_KEY = env_variable("SECRET_KEY")
 
 ALLOWED_HOSTS = [
     "localhost",
-    ".vercel.app",
+    "umm-actually.com",
+    "devotion-450983c14f36.herokuapp.com",
+    "159.54.140.58"
 ]
 
 # Application definition
@@ -164,6 +168,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = 'static/'
 
 # Default primary key field type
@@ -175,7 +180,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.User"
 
 if ORACLE_THICK_MODE:
-    oracle_lib_dir = "/lib/oracle/21/client64/lib"
-    if not os.path.exists(oracle_lib_dir):
+    if DEFAULT_LIB_DIR:
         oracle_lib_dir = None
+        print("Using default Oracle client library directory.")
+    elif not os.path.exists(ORACLE_LIB_DIR):
+        oracle_lib_dir = None
+        print("Oracle client library directory not found.")
+    else:
+        oracle_lib_dir = ORACLE_LIB_DIR
     oracledb.init_oracle_client(lib_dir=oracle_lib_dir)

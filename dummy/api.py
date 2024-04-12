@@ -4,7 +4,7 @@ from time import sleep
 import requests
 
 
-BASE_URL = "http://localhost:8000/"
+BASE_URL = "https://devotion-450983c14f36.herokuapp.com/"
 
 
 class HTTPException(Exception):
