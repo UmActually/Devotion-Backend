@@ -54,6 +54,7 @@ SECRET_KEY = env_variable("SECRET_KEY")
 ALLOWED_HOSTS = [
     "localhost",
     "umm-actually.com",
+    "api.umm-actually.com",
     "devotion-450983c14f36.herokuapp.com",
     "159.54.140.58"
 ]
