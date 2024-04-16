@@ -35,6 +35,8 @@ class ProjectDeserializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        # TODO: Agregar a los líderes también en el set de miembros
+
         project = Project.objects.create(
             name=validated_data["name"],
             description=validated_data.get("description"),

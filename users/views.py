@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
 
 from projects.serializers import ProjectSerializer
+from .models import User
 from .serializers import UserSerializer, UserDeserializer
 
 
@@ -16,28 +17,39 @@ def test(_request: Request) -> Response:
     return Response({"message": "mango foreva"}, status=status.HTTP_200_OK)
 
 
-@api_view(["POST"])
-def create_user(request: Request) -> Response:
-    """
-    Crea un usuario.
+class UsersView(APIView):
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return []
+        return [IsAuthenticated()]
 
-    Campos:
-    - email
-    - password
-    - first_names
-    - last_names
-    """
-    data = request.data
-    serializer = UserDeserializer(data=data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request: Request) -> Response:
+        """
+        Crea un usuario.
 
-    new_user = serializer.save()
+        Campos:
+        - email
+        - password
+        - first_names
+        - last_names
+        """
+        data = request.data
+        serializer = UserDeserializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({
-        "id": new_user.id,
-        "token": str(AccessToken.for_user(new_user))
-    }, status=status.HTTP_201_CREATED)
+        new_user = serializer.save()
+
+        return Response({
+            "id": new_user.id,
+            "token": str(AccessToken.for_user(new_user))
+        }, status=status.HTTP_201_CREATED)
+
+    def get(self, _request: Request) -> Response:
+        """Obtiene todos los usuarios"""
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CurrentUserView(APIView):

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+from users.serializers import UserSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 
@@ -88,6 +89,27 @@ class ProjectView(APIView):
 
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_project_members(request: Request, project_id: str) -> Response:
+    """Obtiene todos los usuarios de un proyecto."""
+    try:
+        project = Project.objects.get(id=project_id)
+    except Project.DoesNotExist:
+        return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+    members = project.members.all()
+
+    if user not in members:
+        return Response(
+            {"message": "You are not a member of this project"},
+            status=status.HTTP_403_FORBIDDEN)
+
+    serializer = UserSerializer(members, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

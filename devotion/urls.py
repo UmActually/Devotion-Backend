@@ -27,16 +27,17 @@ urlpatterns = [
     path("login/", TokenObtainPairView.as_view()),
     path("login/refresh/", TokenRefreshView.as_view()),
     path("test/", users.test),
-    path("users/", users.create_user),
+    path("users/", users.UsersView.as_view()),
     path("me/", users.CurrentUserView.as_view()),
     path("me/projects/", users.get_current_user_projects),
 
     path("projects/", projects.create_project),
     path("projects/<uuid:project_id>/", projects.ProjectView.as_view()),
     path("projects/<uuid:project_id>/subtasks/", projects.get_all_subtree_tasks),
+    path("projects/<uuid:project_id>/members/", projects.get_project_members),
 
     path("tasks/", tasks.create_task),
     path("tasks/<uuid:task_id>/", tasks.TaskView.as_view()),
     path("tasks/<uuid:task_id>/status/", tasks.update_task_status),
-    path("tasks/<uuid:task_id>/subtasks/", tasks.get_all_subtree_tasks),
+    path("tasks/<uuid:task_id>/subtasks/", tasks.get_all_subtree_tasks)
 ]
