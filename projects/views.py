@@ -35,15 +35,16 @@ def create_project(request: Request) -> Response:
     serializer = ProjectSerializer(new_project)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-def get_project_breadcrumbs(project: Project) -> list[str]:
+
+def get_project_breadcrumbs(project: Project) -> list[tuple[str, str]]:
     breadcrumbs = []
     while project.parent:
         breadcrumbs.append((project.parent.id, project.parent.name))
         project = project.parent
 
     breadcrumbs.reverse()
-    
     return breadcrumbs
+
 
 class ProjectView(APIView):
     def get_permissions(self):
@@ -58,18 +59,16 @@ class ProjectView(APIView):
         except Project.DoesNotExist:
             return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # TODO: Este endpoint dará un json grandotote con toda la
-        #  información necesaria para la vista
         serializer = ProjectSerializer(project)
-
         response = serializer.data
 
         response["breadcrumbs"] = get_project_breadcrumbs(project)
         response["subprojects"] = ProjectSerializer(project.projects.all(), many=True).data
-        
-        tasks = TaskViewSerializer(project.tasks.all(), many=True).data
-    
-        response["tasks"] = [task for task in tasks if task["parentTask"] is None]
+        response["tasks"] = TaskViewSerializer(
+            project.tasks.all().filter(parent_task__isnull=True),
+            many=True
+        ).data
+
         return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request: Request, project_id: str) -> Response:
