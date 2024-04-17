@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
+from tasks.serializers import TaskViewSerializer
 
 
 @api_view(["POST"])
@@ -33,6 +34,15 @@ def create_project(request: Request) -> Response:
     serializer = ProjectSerializer(new_project)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+def get_project_breadcrumbs(project: Project) -> list[str]:
+    breadcrumbs = []
+    while project.parent:
+        breadcrumbs.append((project.parent.id, project.parent.name))
+        project = project.parent
+
+    breadcrumbs.reverse()
+    
+    return breadcrumbs
 
 class ProjectView(APIView):
     def get_permissions(self):
@@ -50,7 +60,16 @@ class ProjectView(APIView):
         # TODO: Este endpoint dará un json grandotote con toda la
         #  información necesaria para la vista
         serializer = ProjectSerializer(project)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        response = serializer.data
+
+        response["breadcrumbs"] = get_project_breadcrumbs(project)
+        response["subprojects"] = ProjectSerializer(project.projects.all(), many=True).data
+        
+        tasks = TaskViewSerializer(project.tasks.all(), many=True).data
+    
+        response["tasks"] = [task for task in tasks if task["parentTask"] is None]
+        return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request: Request, project_id: str) -> Response:
         """Actualiza la información de un proyecto."""

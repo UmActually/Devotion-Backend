@@ -12,6 +12,12 @@ class TaskSerializer(CCModelSerializer):
         fields = ("id", "name", "description")
 
 
+class TaskViewSerializer(CCModelSerializer):
+    class Meta:
+        model = Task
+        fields = ("id", "name", "description", "status", "priority", "start_date", "due_date", "asignee", "parent_task")
+
+
 class TaskDeserializer(serializers.Serializer):
     name = serializers.CharField(max_length=128, required=True)
     description = serializers.CharField(max_length=1024, required=False)
