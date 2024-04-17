@@ -59,6 +59,40 @@ ALLOWED_HOSTS = [
     "159.54.140.58"
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:4200",
+    "https://*.umm-actually.com",
+    "http://*.devotion-frontend.vercel.app"
+]
+
+CORS_ORIGIN_WHITELIST = CSRF_TRUSTED_ORIGINS.copy()
+CORS_ALLOWED_ORIGINS = CSRF_TRUSTED_ORIGINS.copy()
+
+# CORS_ORIGIN_ALLOW = True
+# CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT"
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with"
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -71,10 +105,12 @@ INSTALLED_APPS = [
     "users",
     "projects",
     "tasks",
-    "dashboards"
+    "dashboards",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

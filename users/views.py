@@ -47,6 +47,7 @@ class UsersView(APIView):
 
     def get(self, _request: Request) -> Response:
         """Obtiene todos los usuarios"""
+        # TODO: Quitar a los superusers y demás
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
