@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Task, TaskStatus
-from .serializers import TaskSerializer, TaskDeserializer
+from .serializers import TaskSerializer, TaskViewSerializer, TaskDeserializer
 
 
 @api_view(["POST"])
@@ -37,6 +37,25 @@ def create_task(request: Request) -> Response:
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+def get_task_breadcrumbs(task: Task) -> list[tuple[str, str]]:
+    breadcrumbs = []
+    project = task.parent_project
+    task = task.parent_task
+
+    while task is not None:
+        breadcrumbs.append((task.id, task.name))
+        task = task.parent_task
+
+    breadcrumbs.append((project.id, "Tareas"))
+
+    while project is not None:
+        breadcrumbs.append((project.id, project.name))
+        project = project.parent
+
+    breadcrumbs.reverse()
+    return breadcrumbs
+
+
 class TaskView(APIView):
     def get_permissions(self):
         if self.request.method == "GET":
@@ -50,8 +69,13 @@ class TaskView(APIView):
         except Task.DoesNotExist:
             return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = TaskSerializer(task)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = TaskViewSerializer(task)
+        response = serializer.data
+
+        response["breadcrumbs"] = get_task_breadcrumbs(task)
+        response["tasks"] = TaskViewSerializer(task.tasks.all(), many=True).data
+
+        return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request: Request, task_id: str) -> Response:
         """Actualiza la información de una tarea."""

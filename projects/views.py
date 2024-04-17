@@ -38,8 +38,9 @@ def create_project(request: Request) -> Response:
 
 def get_project_breadcrumbs(project: Project) -> list[tuple[str, str]]:
     breadcrumbs = []
-    while project.parent:
-        breadcrumbs.append((project.parent.id, project.parent.name))
+    project = project.parent
+    while project is not None:
+        breadcrumbs.append((project.id, project.name))
         project = project.parent
 
     breadcrumbs.reverse()
@@ -63,7 +64,7 @@ class ProjectView(APIView):
         response = serializer.data
 
         response["breadcrumbs"] = get_project_breadcrumbs(project)
-        response["subprojects"] = ProjectSerializer(project.projects.all(), many=True).data
+        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
         response["tasks"] = TaskViewSerializer(
             project.tasks.all().filter(parent_task__isnull=True),
             many=True
