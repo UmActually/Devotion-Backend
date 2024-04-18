@@ -62,7 +62,8 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:4200",
     "https://*.umm-actually.com",
-    "http://*.devotion-frontend.vercel.app"
+    "https://devotion-frontend.vercel.app",
+    "https://*.devotion-frontend.vercel.app"
 ]
 
 CORS_ORIGIN_WHITELIST = CSRF_TRUSTED_ORIGINS.copy()
