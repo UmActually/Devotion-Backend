@@ -125,11 +125,6 @@ def update_task_status(request: Request, task_id: str) -> Response:
 
     new_status = request.data["status"]
 
-    try:
-        new_status = int(new_status)
-    except ValueError:
-        return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
-
     if new_status not in TaskStatus.values:
         return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
 
