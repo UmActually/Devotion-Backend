@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Task, TaskStatus
-from .serializers import TaskSerializer, TaskDeserializer
+from .serializers import TaskSerializer, TaskViewSerializer, TaskDeserializer
 
 
 @api_view(["POST"])
@@ -37,6 +37,25 @@ def create_task(request: Request) -> Response:
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+def get_task_breadcrumbs(task: Task) -> list[tuple[str, str, bool]]:
+    breadcrumbs = [(task.id, task.name, True)]
+    project = task.parent_project
+    task = task.parent_task
+
+    while task is not None:
+        breadcrumbs.append((task.id, task.name, True))
+        task = task.parent_task
+
+    breadcrumbs.append((project.id, "Tareas", False))
+
+    while project is not None:
+        breadcrumbs.append((project.id, project.name, False))
+        project = project.parent
+
+    breadcrumbs.reverse()
+    return breadcrumbs
+
+
 class TaskView(APIView):
     def get_permissions(self):
         if self.request.method == "GET":
@@ -50,8 +69,13 @@ class TaskView(APIView):
         except Task.DoesNotExist:
             return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = TaskSerializer(task)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = TaskViewSerializer(task)
+        response = serializer.data
+
+        response["breadcrumbs"] = get_task_breadcrumbs(task)
+        response["tasks"] = TaskViewSerializer(task.tasks.all(), many=True).data
+
+        return Response(response, status=status.HTTP_200_OK)
 
     def put(self, request: Request, task_id: str) -> Response:
         """Actualiza la información de una tarea."""
@@ -99,7 +123,14 @@ def update_task_status(request: Request, task_id: str) -> Response:
     if "status" not in request.data:
         return Response({"message": "Missing status field"}, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.data["status"] not in TaskStatus.values:
+    new_status = request.data["status"]
+
+    try:
+        new_status = int(new_status)
+    except ValueError:
+        return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_status not in TaskStatus.values:
         return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
@@ -109,13 +140,12 @@ def update_task_status(request: Request, task_id: str) -> Response:
 
     user = request.user
     is_leader = user in task.parent_project.leaders.all()
-    if user != task.asignee or not is_leader:
+    if user != task.asignee and not is_leader:
         return Response(
             {"message": "You are not the asignee or a leader of this project"},
             status=status.HTTP_403_FORBIDDEN)
 
     old_status = task.status
-    new_status = request.data["status"]
 
     if not is_leader and (old_status == TaskStatus.DONE or new_status == TaskStatus.DONE):
         return Response(
