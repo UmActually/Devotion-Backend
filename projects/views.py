@@ -36,11 +36,11 @@ def create_project(request: Request) -> Response:
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def get_project_breadcrumbs(project: Project) -> list[tuple[str, str]]:
-    breadcrumbs = []
+def get_project_breadcrumbs(project: Project) -> list[tuple[str, str, bool]]:
+    breadcrumbs = [(project.id, project.name, False)]
     project = project.parent
     while project is not None:
-        breadcrumbs.append((project.id, project.name))
+        breadcrumbs.append((project.id, project.name, False))
         project = project.parent
 
     breadcrumbs.reverse()

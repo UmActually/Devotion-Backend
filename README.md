@@ -189,7 +189,8 @@ TODO: Falta refinar la actualización de recursos.
   "breadcrumbs": [
     [
       "4bfca576-83d2-447a-9b79-cdc778417c84",
-      "FSAE 2024"
+      "FSAE 2024",
+      false
     ],
     ...
   ],
@@ -315,7 +316,8 @@ TODO: Falta implementar.
   "breadcrumbs": [
     [
       "4bfca576-83d2-447a-9b79-cdc778417c84",
-      "FSAE 2024"
+      "FSAE 2024",
+      false
     ],
     ...
   ],

@@ -37,19 +37,19 @@ def create_task(request: Request) -> Response:
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def get_task_breadcrumbs(task: Task) -> list[tuple[str, str]]:
-    breadcrumbs = []
+def get_task_breadcrumbs(task: Task) -> list[tuple[str, str, bool]]:
+    breadcrumbs = [(task.id, task.name, True)]
     project = task.parent_project
     task = task.parent_task
 
     while task is not None:
-        breadcrumbs.append((task.id, task.name))
+        breadcrumbs.append((task.id, task.name, True))
         task = task.parent_task
 
-    breadcrumbs.append((project.id, "Tareas"))
+    breadcrumbs.append((project.id, "Tareas", False))
 
     while project is not None:
-        breadcrumbs.append((project.id, project.name))
+        breadcrumbs.append((project.id, project.name, False))
         project = project.parent
 
     breadcrumbs.reverse()
