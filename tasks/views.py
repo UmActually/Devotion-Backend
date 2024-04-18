@@ -123,7 +123,14 @@ def update_task_status(request: Request, task_id: str) -> Response:
     if "status" not in request.data:
         return Response({"message": "Missing status field"}, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.data["status"] not in TaskStatus.values:
+    new_status = request.data["status"]
+
+    try:
+        new_status = int(new_status)
+    except ValueError:
+        return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_status not in TaskStatus.values:
         return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
@@ -133,13 +140,12 @@ def update_task_status(request: Request, task_id: str) -> Response:
 
     user = request.user
     is_leader = user in task.parent_project.leaders.all()
-    if user != task.asignee or not is_leader:
+    if user != task.asignee and not is_leader:
         return Response(
             {"message": "You are not the asignee or a leader of this project"},
             status=status.HTTP_403_FORBIDDEN)
 
     old_status = task.status
-    new_status = request.data["status"]
 
     if not is_leader and (old_status == TaskStatus.DONE or new_status == TaskStatus.DONE):
         return Response(
