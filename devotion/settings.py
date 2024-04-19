@@ -62,15 +62,12 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:4200",
     "https://*.umm-actually.com",
-    "http://*.devotion-frontend.vercel.app"
+    "https://devotion-frontend.vercel.app",
+    "https://*.devotion-frontend.vercel.app"
 ]
 
 CORS_ORIGIN_WHITELIST = CSRF_TRUSTED_ORIGINS.copy()
 CORS_ALLOWED_ORIGINS = CSRF_TRUSTED_ORIGINS.copy()
-
-# CORS_ORIGIN_ALLOW = True
-# CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
     "DELETE",
@@ -181,14 +178,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'auth.google_jwt_auth.GoogleJWTAuthentication',
     ),
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'AUTH_TOKEN_CLASSES': (
+        'rest_framework_simplejwt.tokens.AccessToken',
+    ),
 }
 
 # Internationalization
@@ -219,10 +218,8 @@ AUTH_USER_MODEL = "users.User"
 if ORACLE_THICK_MODE:
     if DEFAULT_LIB_DIR:
         oracle_lib_dir = None
-        print("Using default Oracle client library directory.")
     elif not os.path.exists(ORACLE_LIB_DIR):
         oracle_lib_dir = None
-        print("Oracle client library directory not found.")
     else:
         oracle_lib_dir = ORACLE_LIB_DIR
     oracledb.init_oracle_client(lib_dir=oracle_lib_dir)
