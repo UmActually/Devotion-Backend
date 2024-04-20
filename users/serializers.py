@@ -21,12 +21,16 @@ class UserDeserializer(serializers.Serializer):
     last_names = serializers.CharField(max_length=64, required=True)
 
     def validate(self, attrs):
-        email = attrs["email"]
-        if User.objects.filter(email=email).exists():
+        if "email" in attrs and User.objects.filter(email=attrs["email"]).exists():
             raise serializers.ValidationError("This email is already in use")
-
         return attrs
 
     def create(self, validated_data):
         validated_data["password"] = make_password(validated_data["password"])
         return User.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

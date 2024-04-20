@@ -1,8 +1,10 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from google.auth.exceptions import GoogleAuthError
 from users.models import User
 
 
@@ -10,7 +12,7 @@ class GoogleJWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
         token_header = request.headers.get("Authorization", "").split(" ")
         if len(token_header) != 2:
-            raise AuthenticationFailed("Invalid token")
+            return AnonymousUser(), None
 
         token_type, token = token_header
 
@@ -31,9 +33,8 @@ class GoogleJWTAuthentication(BaseAuthentication):
                     last_names=id_info.get("family_name", "")
                 )
 
-            print("Google ID token authentication successful", user)
             return user, token
-        except (ValueError, KeyError, AuthenticationFailed):
+        except (ValueError, KeyError, GoogleAuthError):
             # Google ID token validation failed
             # Attempt Simple JWT token validation
             jwt_auth = JWTAuthentication()

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+from projects.models import Project
 from .models import Task, TaskStatus
 from .serializers import TaskSerializer, TaskViewSerializer, TaskDeserializer
 
@@ -30,10 +31,17 @@ def create_task(request: Request) -> Response:
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # TODO: Validar que el usuario pertenezca al proyecto
+    user = request.user
+    parent_project_id = serializer.validated_data["parent_project"]
+    if not user.is_superuser:
+        parent_project = Project.objects.get(id=parent_project_id)
+        if user not in parent_project.members.all():
+            return Response(
+                {"message": "You are not a member of this project"},
+                status=status.HTTP_403_FORBIDDEN)
 
-    new_project = serializer.save()
-    serializer = TaskSerializer(new_project)
+    new_task = serializer.save()
+    serializer = TaskSerializer(new_task)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -85,13 +93,13 @@ class TaskView(APIView):
             return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if user not in task.parent_project.leaders.all():
+        if not user.is_superuser and user not in task.parent_project.leaders.all():
             return Response(
                 {"message": "You are not a leader of this project"},
                 status=status.HTTP_403_FORBIDDEN)
 
         data = request.data
-        serializer = TaskDeserializer(data=data, instance=task)
+        serializer = TaskDeserializer(task, data=data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -107,7 +115,7 @@ class TaskView(APIView):
             return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if user not in task.parent_project.leaders.all():
+        if not user.is_superuser and user not in task.parent_project.leaders.all():
             return Response(
                 {"message": "You are not a leader of this project"},
                 status=status.HTTP_403_FORBIDDEN)
@@ -134,7 +142,7 @@ def update_task_status(request: Request, task_id: str) -> Response:
         return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
     user = request.user
-    is_leader = user in task.parent_project.leaders.all()
+    is_leader = user.is_superuser or user in task.parent_project.leaders.all()
     if user != task.asignee and not is_leader:
         return Response(
             {"message": "You are not the asignee or a leader of this project"},
