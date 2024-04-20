@@ -142,8 +142,6 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
 - `first_names` (opcional)
 - `last_names` (opcional)
 
-TODO: Falta refinar la actualización de recursos.
-
 ---
 
 #### GET `/me/projects/` - _Obtener proyectos del usuario ☆_
@@ -274,8 +272,6 @@ TODO: Falta implementar.
 - `leaders` (opcional) - _IDs de usuarios líderes separados por ","_
 - `members` (opcional) - _IDs de usuarios miembros separados por ","_
 
-TODO: Falta implementar.
-
 ---
 
 #### DELETE `/projects/<id>/` - _Eliminar proyecto ☆_
@@ -377,8 +373,6 @@ TODO: Falta implementar.
 - `parent_project` (opcional) - _ID del proyecto papá_
 - `parent_task` (opcional) - _ID de la tarea papá_
 - `asignee` (opcional) - _ID del usuario asignado_
-
-TODO: Falta implementar.
 
 ---
 

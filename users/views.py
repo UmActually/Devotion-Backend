@@ -47,8 +47,7 @@ class UsersView(APIView):
 
     def get(self, _request: Request) -> Response:
         """Obtiene todos los usuarios"""
-        # TODO: Quitar a los superusers y demás
-        users = User.objects.all()
+        users = User.objects.filter(is_superuser=False)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -68,11 +67,12 @@ class CurrentUserView(APIView):
                 {"message": "You cannot update your password here"},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = UserDeserializer(request.data, instance=request.user)
+        serializer = UserDeserializer(request.user, data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer.save()
+        user = serializer.save()
+        serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -81,12 +81,6 @@ class CurrentUserView(APIView):
 def get_current_user_projects(request: Request) -> Response:
     """Obtiene los proyectos del usuario autenticado."""
     user = request.user
-
-    # Query que obtiene los proyectos que no tienen parent y donde el usuario
-    # autenticado está en los IDs de los miembros o líderes
-    # projects = (user.leader_of.filter(parent__isnull=True) |
-    #             user.member_of.filter(parent__isnull=True))
-    projects = user.leader_of.filter(parent__isnull=True)
-
+    projects = user.member_of.filter(parent__isnull=True)
     serializer = ProjectSerializer(projects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

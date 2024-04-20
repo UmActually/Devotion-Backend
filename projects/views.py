@@ -29,7 +29,13 @@ def create_project(request: Request) -> Response:
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # TODO: Validar, si es un subproyecto, que el usuario sea líder
+    parent_id = serializer.validated_data.get("parent")
+    if parent_id is not None and not request.user.is_superuser:
+        parent = Project.objects.get(id=parent_id)
+        if request.user not in parent.leaders.all():
+            return Response(
+                {"message": "You are not a leader of the parent project"},
+                status=status.HTTP_403_FORBIDDEN)
 
     new_project = serializer.save()
     serializer = ProjectSerializer(new_project)
@@ -80,12 +86,12 @@ class ProjectView(APIView):
             return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if user not in project.leaders.all():
+        if not user.is_superuser and user not in project.leaders.all():
             return Response(
                 {"message": "You are not a leader of this project"},
                 status=status.HTTP_403_FORBIDDEN)
 
-        serializer = ProjectDeserializer(request.data, instance=project)
+        serializer = ProjectDeserializer(project, data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,7 +107,7 @@ class ProjectView(APIView):
             return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if user not in project.leaders.all():
+        if not user.is_superuser and user not in project.leaders.all():
             return Response(
                 {"message": "You are not a leader of this project"},
                 status=status.HTTP_403_FORBIDDEN)
@@ -122,7 +128,7 @@ def get_project_members(request: Request, project_id: str) -> Response:
     user = request.user
     members = project.members.all()
 
-    if user not in members:
+    if not user.is_superuser and user not in members:
         return Response(
             {"message": "You are not a member of this project"},
             status=status.HTTP_403_FORBIDDEN)
