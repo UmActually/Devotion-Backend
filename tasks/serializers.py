@@ -1,7 +1,6 @@
 import datetime
 from rest_framework import serializers
 from global_serializers import CCModelSerializer
-from users.models import User
 from projects.models import Project
 from .models import Task, TaskStatus, TaskPriority
 
@@ -10,19 +9,19 @@ def get_project_or_error(project_id: str) -> Project:
     try:
         return Project.objects.get(id=project_id)
     except Project.DoesNotExist:
-        raise serializers.ValidationError("The parent project does not exist.")
+        raise serializers.ValidationError("El proyecto papá no existe.")
 
 
 def get_task_or_error(task_id: str) -> Task:
     try:
         return Task.objects.get(id=task_id)
     except Task.DoesNotExist:
-        raise serializers.ValidationError("The parent task does not exist.")
+        raise serializers.ValidationError("La tarea papá no existe.")
 
 
 def check_project_membership(asignee_id: str, project: Project) -> None:
     if asignee_id not in map(lambda m: str(m.id), project.members.all()):
-        raise serializers.ValidationError("The asignee is not a member of the parent project.")
+        raise serializers.ValidationError("El asignado no pertenece al proyecto papá.")
 
 
 class TaskSerializer(CCModelSerializer):
@@ -60,18 +59,26 @@ class TaskDeserializer(serializers.Serializer):
         if "parent_task" in attrs:
             parent_task = get_task_or_error(attrs["parent_task"])
             if self.instance and self.instance.id == parent_task.id:
-                raise serializers.ValidationError("A task cannot be its own parent.")
+                raise serializers.ValidationError("Una tarea no puede ser su propia tarea papá.")
             if parent_task.parent_project_id != parent_project.id:
-                raise serializers.ValidationError("The parent task does not belong to the same parent project.")
+                raise serializers.ValidationError("La nueva tarea papá no pertenece al mismo proyecto.")
 
         asignee_id = attrs.get("asignee") or str(self.instance.asignee_id)
         check_project_membership(asignee_id, parent_project)
 
         if "priority" in attrs and attrs["priority"] not in TaskPriority.values:
-            raise serializers.ValidationError("Invalid priority value.")
+            raise serializers.ValidationError("Valor de prioridad inválido.")
 
-        if "start_date" in attrs and "due_date" in attrs and attrs["start_date"] > attrs["due_date"]:
-            raise serializers.ValidationError("Start date must be before due date.")
+        try:
+            start_date = attrs.get("start_date") or self.instance.start_date
+        except AttributeError:
+            return attrs
+
+        due_date = attrs.get("due_date") or self.instance.due_date
+
+        if start_date > due_date:
+            raise serializers.ValidationError(
+                "La fecha de inicio no puede ser después de la fecha de entrega.")
 
         return attrs
 

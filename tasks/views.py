@@ -37,7 +37,7 @@ def create_task(request: Request) -> Response:
         parent_project = Project.objects.get(id=parent_project_id)
         if user not in parent_project.members.all():
             return Response(
-                {"message": "You are not a member of this project"},
+                {"message": "No eres miembro de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
 
     new_task = serializer.save()
@@ -75,7 +75,7 @@ class TaskView(APIView):
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
-            return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = TaskViewSerializer(task)
         response = serializer.data
@@ -90,12 +90,12 @@ class TaskView(APIView):
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
-            return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
         if not user.is_superuser and user not in task.parent_project.leaders.all():
             return Response(
-                {"message": "You are not a leader of this project"},
+                {"message": "No eres líder de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
 
         data = request.data
@@ -112,12 +112,12 @@ class TaskView(APIView):
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
-            return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
         if not user.is_superuser and user not in task.parent_project.leaders.all():
             return Response(
-                {"message": "You are not a leader of this project"},
+                {"message": "No eres líder de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
 
         task.delete()
@@ -129,30 +129,30 @@ class TaskView(APIView):
 def update_task_status(request: Request, task_id: str) -> Response:
     """Actualiza el estado de una tarea."""
     if "status" not in request.data:
-        return Response({"message": "Missing status field"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Campo 'status' faltante."}, status=status.HTTP_400_BAD_REQUEST)
 
     new_status = request.data["status"]
 
     if new_status not in TaskStatus.values:
-        return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Valor de status inválido."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         task = Task.objects.get(id=task_id)
     except Task.DoesNotExist:
-        return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
     user = request.user
     is_leader = user.is_superuser or user in task.parent_project.leaders.all()
     if user != task.asignee and not is_leader:
         return Response(
-            {"message": "You are not the asignee or a leader of this project"},
+            {"message": "No eres el asignado de esta tarea, o líder del proyecto."},
             status=status.HTTP_403_FORBIDDEN)
 
     old_status = task.status
 
     if not is_leader and (old_status == TaskStatus.DONE or new_status == TaskStatus.DONE):
         return Response(
-            {"message": "Only leaders can mark tasks as done, or undo this action"},
+            {"message": "Solo los líderes pueden marcar tareas como completadas, o desmarcarlas."},
             status=status.HTTP_403_FORBIDDEN)
 
     task.status = new_status
@@ -168,7 +168,7 @@ def get_all_subtree_tasks(_request: Request, task_id: str) -> Response:
     try:
         Task.objects.get(id=task_id)
     except Task.DoesNotExist:
-        return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
     # TODO: Query bien hermoso para buscar en todo el
     #  subárbol de tareas parte 2

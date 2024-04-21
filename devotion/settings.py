@@ -35,7 +35,7 @@ def read_env_file(name: str) -> str:
             if line.startswith(name) and "='" in line:
                 return line.split("='")[1][:-1]
         else:
-            raise KeyError("Environment variable name not found in .env file.")
+            raise KeyError(f"'{name}' no se encuentra en el archivo .env")
 
 
 def env_variable(name: str) -> str:
@@ -115,6 +115,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware'
 ]
 
 ROOT_URLCONF = 'devotion.urls'
@@ -193,7 +194,7 @@ SIMPLE_JWT = {
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
 TIME_ZONE = 'UTC'
 

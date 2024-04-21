@@ -17,7 +17,7 @@ class GoogleJWTAuthentication(BaseAuthentication):
         token_type, token = token_header
 
         if token_type != "Bearer":
-            raise AuthenticationFailed("Invalid token type")
+            raise AuthenticationFailed("Tipo de token inválido.")
 
         try:
             # Attempt Google ID token validation
