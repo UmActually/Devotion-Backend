@@ -36,7 +36,7 @@ class TaskViewSerializer(CCModelSerializer):
     class Meta:
         model = Task
         fields = ("id", "name", "description", "status", "priority",
-                  "start_date", "due_date", "asignee")
+                  "start_date", "due_date", "asignee", "parent_project", "parent_task")
 
 
 class TaskDeserializer(serializers.Serializer):
