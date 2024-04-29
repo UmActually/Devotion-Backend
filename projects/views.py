@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
@@ -6,6 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from users.serializers import UserSerializer
+from tasks.models import Task
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 from tasks.serializers import TaskViewSerializer
@@ -141,10 +143,18 @@ def get_project_members(request: Request, project_id: str) -> Response:
 def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
     """Obtiene todas las tareas de un proyecto y sus subproyectos."""
     try:
-        Project.objects.get(id=project_id)
+        project = Project.objects.get(id=project_id)
     except Project.DoesNotExist:
         return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-    # TODO: Query bien hermoso para buscar en todo el
-    #  subárbol de tareas
-    return Response([], status=status.HTTP_200_OK)
+    all_tasks: QuerySet = project.tasks.all()
+
+    def recurse_project(_project: Project) -> None:
+        nonlocal all_tasks
+        for subproject in _project.projects.all():
+            recurse_project(subproject)
+            all_tasks |= _project.tasks.all()
+
+    recurse_project(project)
+    serializer = TaskViewSerializer(all_tasks, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
