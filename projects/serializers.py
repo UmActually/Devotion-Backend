@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from rest_framework import serializers
 from dashboards.models import Dashboard
 
@@ -12,17 +10,17 @@ def get_project_or_error(project_id: str) -> Project:
     try:
         return Project.objects.get(id=project_id)
     except Project.DoesNotExist:
-        raise serializers.ValidationError("The parent project does not exist.")
+        raise serializers.ValidationError("El proyecto papá no existe.")
 
 
 def check_members_exist(members: list[str]) -> None:
     if not all(User.objects.filter(id=member).exists() for member in members):
-        raise serializers.ValidationError("One or more members/leaders do not exist.")
+        raise serializers.ValidationError("Uno o más miembros/líderes no existen.")
 
 
 def check_members_are_subset(members: list[str], parent_members: set[str]) -> None:
     if not set(members).issubset(parent_members):
-        raise serializers.ValidationError("One or more members/leaders are not members of the parent project.")
+        raise serializers.ValidationError("Uno o más miembros/líderes no pertenecen al proyecto papá.")
 
 
 class ProjectSerializer(CCModelSerializer):
@@ -49,7 +47,7 @@ class ProjectDeserializer(serializers.Serializer):
             parent_id = attrs.get("parent") or self.instance.parent_id
             parent = get_project_or_error(parent_id)
             if self.instance and str(self.instance.id) == str(parent_id):
-                raise serializers.ValidationError("A project cannot be its own parent.")
+                raise serializers.ValidationError("Un proyecto no puede ser su propio papá.")
             parent_members = set(map(lambda m: str(m.id), parent.members.all()))
             check_members_are_subset(leaders, parent_members)
             check_members_are_subset(members, parent_members)

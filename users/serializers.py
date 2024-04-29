@@ -22,7 +22,7 @@ class UserDeserializer(serializers.Serializer):
 
     def validate(self, attrs):
         if "email" in attrs and User.objects.filter(email=attrs["email"]).exists():
-            raise serializers.ValidationError("This email is already in use")
+            raise serializers.ValidationError("Este correo ya está registrado.")
         return attrs
 
     def create(self, validated_data):

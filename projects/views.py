@@ -34,7 +34,7 @@ def create_project(request: Request) -> Response:
         parent = Project.objects.get(id=parent_id)
         if request.user not in parent.leaders.all():
             return Response(
-                {"message": "You are not a leader of the parent project"},
+                {"message": "No eres líder del proyecto papá."},
                 status=status.HTTP_403_FORBIDDEN)
 
     new_project = serializer.save()
@@ -64,7 +64,7 @@ class ProjectView(APIView):
         try:
             project = Project.objects.get(id=project_id)
         except Project.DoesNotExist:
-            return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ProjectSerializer(project)
         response = serializer.data
@@ -83,12 +83,12 @@ class ProjectView(APIView):
         try:
             project = Project.objects.get(id=project_id)
         except Project.DoesNotExist:
-            return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
         if not user.is_superuser and user not in project.leaders.all():
             return Response(
-                {"message": "You are not a leader of this project"},
+                {"message": "No eres líder de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
 
         serializer = ProjectDeserializer(project, data=request.data, partial=True)
@@ -104,12 +104,12 @@ class ProjectView(APIView):
         try:
             project = Project.objects.get(id=project_id)
         except Project.DoesNotExist:
-            return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
         if not user.is_superuser and user not in project.leaders.all():
             return Response(
-                {"message": "You are not a leader of this project"},
+                {"message": "No eres líder de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
 
         project.delete()
@@ -123,14 +123,14 @@ def get_project_members(request: Request, project_id: str) -> Response:
     try:
         project = Project.objects.get(id=project_id)
     except Project.DoesNotExist:
-        return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
     user = request.user
     members = project.members.all()
 
     if not user.is_superuser and user not in members:
         return Response(
-            {"message": "You are not a member of this project"},
+            {"message": "No eres miembro de este proyecto."},
             status=status.HTTP_403_FORBIDDEN)
 
     serializer = UserSerializer(members, many=True)
@@ -143,7 +143,7 @@ def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
     try:
         Project.objects.get(id=project_id)
     except Project.DoesNotExist:
-        return Response({"message": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
     # TODO: Query bien hermoso para buscar en todo el
     #  subárbol de tareas

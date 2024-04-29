@@ -14,7 +14,7 @@ from .serializers import UserSerializer, UserDeserializer
 @api_view(["GET"])
 def test(_request: Request) -> Response:
     """Endpoint de prueba."""
-    return Response({"message": "mango foreva"}, status=status.HTTP_200_OK)
+    return Response({"message": "mango para siempre tío"}, status=status.HTTP_200_OK)
 
 
 class UsersView(APIView):
@@ -64,7 +64,7 @@ class CurrentUserView(APIView):
         """Actualiza la información del usuario autenticado."""
         if "password" in request.data:
             return Response(
-                {"message": "You cannot update your password here"},
+                {"message": "No se puede actualizar la contraseña por este medio."},
                 status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserDeserializer(request.user, data=request.data, partial=True)
