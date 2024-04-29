@@ -210,6 +210,7 @@ Para crear o actualizar un recurso, el usuario debe ser l√≠der del proyecto pap√
       "startDate": "2024-02-13",
       "dueDate": "2024-02-21",
       "asignee": "Alexander Albon",
+      "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
       "parentTask": null
     },
     ...
@@ -252,6 +253,7 @@ Para crear o actualizar un recurso, el usuario debe ser l√≠der del proyecto pap√
     "startDate": "2024-02-13",
     "dueDate": "2024-02-21",
     "asignee": "Alexander Albon",
+    "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
     "parentTask": null
   },
   ...
@@ -327,6 +329,7 @@ TODO: Falta implementar.
       "startDate": "2024-02-13",
       "dueDate": "2024-02-21",
       "asignee": "Alexander Albon",
+      "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
       "parentTask": null
     },
     ...
@@ -351,6 +354,7 @@ TODO: Falta implementar.
     "startDate": "2024-02-13",
     "dueDate": "2024-02-21",
     "asignee": "Alexander Albon",
+    "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
     "parentTask": null
   },
   ...

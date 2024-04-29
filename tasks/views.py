@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
@@ -166,10 +167,18 @@ def update_task_status(request: Request, task_id: str) -> Response:
 def get_all_subtree_tasks(_request: Request, task_id: str) -> Response:
     """Obtiene todas las subtareas de una tarea."""
     try:
-        Task.objects.get(id=task_id)
+        task = Task.objects.get(id=task_id)
     except Task.DoesNotExist:
         return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
-    # TODO: Query bien hermoso para buscar en todo el
-    #  subárbol de tareas parte 2
-    return Response([], status=status.HTTP_200_OK)
+    all_tasks: QuerySet = task.tasks.all()
+
+    def recurse_task(_task: Task) -> None:
+        nonlocal all_tasks
+        for subtask in _task.tasks.all():
+            recurse_task(subtask)
+            all_tasks |= _task.tasks.all()
+
+    recurse_task(task)
+    serializer = TaskViewSerializer(all_tasks, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
