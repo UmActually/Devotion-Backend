@@ -9,6 +9,7 @@ from users.serializers import UserSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 from tasks.serializers import TaskViewSerializer
+from tasks.views import TaskStatus
 
 
 @api_view(["POST"])
@@ -75,6 +76,7 @@ class ProjectView(APIView):
             project.tasks.all().filter(parent_task__isnull=True),
             many=True
         ).data
+        response["progress"] = len([task for task in response["tasks"] if task["status"] == TaskStatus.DONE]) / len(response["tasks"])
 
         return Response(response, status=status.HTTP_200_OK)
 
