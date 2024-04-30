@@ -71,12 +71,12 @@ class ProjectView(APIView):
         response = serializer.data
 
         response["breadcrumbs"] = get_project_breadcrumbs(project)
-        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
         response["tasks"] = TaskViewSerializer(
             project.tasks.all().filter(parent_task__isnull=True),
             many=True
         ).data
-        response["progress"] = len([task for task in response["tasks"] if task["status"] == TaskStatus.DONE]) / len(response["tasks"])
+        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
+        response["progress"] = project.progress
 
         return Response(response, status=status.HTTP_200_OK)
 

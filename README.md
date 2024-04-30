@@ -213,7 +213,8 @@ Para crear o actualizar un recurso, el usuario debe ser l√≠der del proyecto pap√
       "parentTask": null
     },
     ...
-  ]
+  ],
+  "progress": 50
 }
 ```
 

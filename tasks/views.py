@@ -33,12 +33,17 @@ def create_task(request: Request) -> Response:
 
     user = request.user
     parent_project_id = serializer.validated_data["parent_project"]
+    parent_project = Project.objects.get(id=parent_project_id)
+
     if not user.is_superuser:
-        parent_project = Project.objects.get(id=parent_project_id)
         if user not in parent_project.members.all():
             return Response(
                 {"message": "You are not a member of this project"},
                 status=status.HTTP_403_FORBIDDEN)
+
+    parent_project.progress *= len(parent_project.tasks)
+    parent_project.progress /= len(parent_project.tasks) + 1
+    parent_project.save()
 
     new_task = serializer.save()
     serializer = TaskSerializer(new_task)
@@ -104,6 +109,13 @@ class TaskView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         task = serializer.save()
+
+        if "status" in data and data["status"] == TaskStatus.DONE:
+            task.parent_project.progress *= len(task.parent_project.tasks)
+            task.parent_project.progress += 1
+            task.parent_project.progress /= len(task.parent_project.tasks)
+            task.parent_project.save()
+
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -119,6 +131,12 @@ class TaskView(APIView):
             return Response(
                 {"message": "You are not a leader of this project"},
                 status=status.HTTP_403_FORBIDDEN)
+        
+        task.parent_project.progress *= len(task.parent_project.tasks)
+        if task.status == TaskStatus.DONE:
+            task.parent_project.progress -= 1
+        task.parent_project.progress /= len(task.parent_project.tasks) - 1
+        task.parent_project.save()
 
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -157,6 +175,17 @@ def update_task_status(request: Request, task_id: str) -> Response:
 
     task.status = new_status
     task.save()
+
+    if old_status == TaskStatus.DONE:
+        task.parent_project.progress *= len(task.parent_project.tasks)
+        task.parent_project.progress -= 1
+        task.parent_project.progress /= len(task.parent_project.tasks)
+        task.parent_project.save()
+    elif new_status == TaskStatus.DONE:
+        task.parent_project.progress *= len(task.parent_project.tasks)
+        task.parent_project.progress += 1
+        task.parent_project.progress /= len(task.parent_project.tasks)
+        task.parent_project.save()
 
     serializer = TaskSerializer(task)
     return Response(serializer.data, status=status.HTTP_200_OK)
