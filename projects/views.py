@@ -11,6 +11,7 @@ from tasks.models import Task
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 from tasks.serializers import TaskViewSerializer
+from tasks.views import TaskStatus
 
 
 @api_view(["POST"])
@@ -72,11 +73,12 @@ class ProjectView(APIView):
         response = serializer.data
 
         response["breadcrumbs"] = get_project_breadcrumbs(project)
-        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
         response["tasks"] = TaskViewSerializer(
             project.tasks.all().filter(parent_task__isnull=True),
             many=True
         ).data
+        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
+        response["progress"] = project.progress
 
         return Response(response, status=status.HTTP_200_OK)
 
