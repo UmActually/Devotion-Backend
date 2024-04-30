@@ -1,3 +1,4 @@
+from uuid import UUID
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
@@ -84,9 +85,9 @@ def get_current_user_projects(request: Request) -> Response:
     
     projects = user.member_of.filter(parent__isnull=True)
     serializer = ProjectSerializer(projects, many=True)
-    leaded_serializer = ProjectSerializer(user.leader_of.filter(parent__isnull=True), many=True)
-    
+    leaded_projects = user.leader_of.filter(parent__isnull=True).values_list("id", flat=True)
+
     for project in serializer.data:
-        project["isLeader"] = project in leaded_serializer.data
+        project["isLeader"] = UUID(project["id"]) in leaded_projects
 
     return Response(serializer.data, status=status.HTTP_200_OK)
