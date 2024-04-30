@@ -10,6 +10,10 @@ from .models import Task, TaskStatus
 from .serializers import TaskSerializer, TaskViewSerializer, TaskDeserializer
 
 
+def bad_request(message: str) -> Response:
+    return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_task(request: Request) -> Response:
@@ -122,18 +126,21 @@ class TaskView(APIView):
             return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if not user.is_superuser and user not in task.parent_project.leaders.all():
+        parent_project = task.parent_project
+        if not user.is_superuser and user not in parent_project.leaders.all():
             return Response(
                 {"message": "No eres líder de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
-        
-        task.parent_project.progress *= len(task.parent_project.tasks)
-        if task.status == TaskStatus.DONE:
-            task.parent_project.progress -= 1
-        task.parent_project.progress /= len(task.parent_project.tasks) - 1
-        task.parent_project.save()
 
         task.delete()
+
+        task_count = parent_project.tasks.count()
+        parent_project.progress *= task_count + 1
+        if task.status == TaskStatus.DONE:
+            parent_project.progress -= 100
+        parent_project.progress /= task_count
+        parent_project.save()
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -143,15 +150,13 @@ def update_task_status(request: Request, task_id: str) -> Response:
     """Actualiza el estado de una tarea."""
 
     if "status" not in request.data:
-        return Response({"message": "Campo 'status' faltante."}, status=status.HTTP_400_BAD_REQUEST)
-
+        return bad_request("Campo 'status' faltante.")
     try:
         new_status = int(request.data["status"])
     except ValueError:
-        return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
-
+        return bad_request("Valor de status inválido.")
     if new_status not in TaskStatus.values:
-        return Response({"message": "Valor de status inválido."}, status=status.HTTP_400_BAD_REQUEST)
+        return bad_request("Valor de status inválido.")
 
     try:
         task = Task.objects.get(id=task_id)
