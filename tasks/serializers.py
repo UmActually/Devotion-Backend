@@ -1,7 +1,6 @@
 import datetime
 from rest_framework import serializers
 from global_serializers import CCModelSerializer
-from users.models import User
 from projects.models import Project
 from .models import Task, TaskStatus, TaskPriority
 
@@ -57,6 +56,9 @@ class TaskDeserializer(serializers.Serializer):
         parent_project = get_project_or_error(attrs["parent_project"]) \
             if "parent_project" in attrs else self.instance.parent_project
 
+        self.context["parent_project"] = parent_project
+        self.context["parent_project_task_count"] = parent_project.tasks.count()
+
         if "parent_task" in attrs:
             parent_task = get_task_or_error(attrs["parent_task"])
             if self.instance and self.instance.id == parent_task.id:
@@ -78,8 +80,10 @@ class TaskDeserializer(serializers.Serializer):
     def create(self, validated_data):
         validated_data.setdefault("priority", TaskPriority.MEDIUM)
         validated_data.setdefault("start_date", min(datetime.date.today(), validated_data["due_date"]))
+        parent_project = self.context["parent_project"]
+        task_count = self.context["parent_project_task_count"]
 
-        return Task.objects.create(
+        task = Task.objects.create(
             name=validated_data["name"],
             description=validated_data.get("description"),
             status=TaskStatus.NOT_STARTED,
@@ -90,6 +94,11 @@ class TaskDeserializer(serializers.Serializer):
             parent_task_id=validated_data.get("parent_task"),
             asignee_id=validated_data["asignee"]
         )
+
+        parent_project.progress *= task_count
+        parent_project.progress /= task_count + 1
+        parent_project.save()
+        return task
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():

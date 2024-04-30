@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from projects.models import Project
 from .models import Task, TaskStatus
 from .serializers import TaskSerializer, TaskViewSerializer, TaskDeserializer
 
@@ -32,18 +31,13 @@ def create_task(request: Request) -> Response:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     user = request.user
-    parent_project_id = serializer.validated_data["parent_project"]
-    parent_project = Project.objects.get(id=parent_project_id)
+    parent_project = serializer.context["parent_project"]
 
     if not user.is_superuser:
         if user not in parent_project.members.all():
             return Response(
                 {"message": "You are not a member of this project"},
                 status=status.HTTP_403_FORBIDDEN)
-
-    parent_project.progress *= len(parent_project.tasks)
-    parent_project.progress /= len(parent_project.tasks) + 1
-    parent_project.save()
 
     new_task = serializer.save()
     serializer = TaskSerializer(new_task)
@@ -146,10 +140,14 @@ class TaskView(APIView):
 @permission_classes([IsAuthenticated])
 def update_task_status(request: Request, task_id: str) -> Response:
     """Actualiza el estado de una tarea."""
+
     if "status" not in request.data:
         return Response({"message": "Missing status field"}, status=status.HTTP_400_BAD_REQUEST)
 
-    new_status = request.data["status"]
+    try:
+        new_status = int(request.data["status"])
+    except ValueError:
+        return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
 
     if new_status not in TaskStatus.values:
         return Response({"message": "Invalid status value"}, status=status.HTTP_400_BAD_REQUEST)
@@ -160,13 +158,16 @@ def update_task_status(request: Request, task_id: str) -> Response:
         return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
     user = request.user
-    is_leader = user.is_superuser or user in task.parent_project.leaders.all()
+    parent_project = task.parent_project
+    is_leader = user.is_superuser or user in parent_project.leaders.all()
     if user != task.asignee and not is_leader:
         return Response(
             {"message": "You are not the asignee or a leader of this project"},
             status=status.HTTP_403_FORBIDDEN)
 
     old_status = task.status
+    if old_status == new_status:
+        return Response({"message": "Task is already in this status"}, status=status.HTTP_204_NO_CONTENT)
 
     if not is_leader and (old_status == TaskStatus.DONE or new_status == TaskStatus.DONE):
         return Response(
@@ -176,16 +177,16 @@ def update_task_status(request: Request, task_id: str) -> Response:
     task.status = new_status
     task.save()
 
+    task_count = parent_project.tasks.count()
     if old_status == TaskStatus.DONE:
-        task.parent_project.progress *= len(task.parent_project.tasks)
-        task.parent_project.progress -= 1
-        task.parent_project.progress /= len(task.parent_project.tasks)
-        task.parent_project.save()
-    elif new_status == TaskStatus.DONE:
-        task.parent_project.progress *= len(task.parent_project.tasks)
-        task.parent_project.progress += 1
-        task.parent_project.progress /= len(task.parent_project.tasks)
-        task.parent_project.save()
+        parent_project.progress *= task_count
+        parent_project.progress -= 100
+        parent_project.progress /= task_count
+    if new_status == TaskStatus.DONE:
+        parent_project.progress *= task_count
+        parent_project.progress += 100
+        parent_project.progress /= task_count
+    parent_project.save()
 
     serializer = TaskSerializer(task)
     return Response(serializer.data, status=status.HTTP_200_OK)
