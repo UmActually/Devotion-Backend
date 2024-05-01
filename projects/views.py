@@ -6,12 +6,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from users.serializers import UserSerializer
-from tasks.models import Task
+from users.serializers import UserSerializer, UserMinimalSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
-from tasks.serializers import TaskViewSerializer
-from tasks.views import TaskStatus
+from tasks.serializers import SubtaskViewSerializer
 
 
 @api_view(["POST"])
@@ -73,12 +71,14 @@ class ProjectView(APIView):
         response = serializer.data
 
         response["breadcrumbs"] = get_project_breadcrumbs(project)
-        response["tasks"] = TaskViewSerializer(
-            project.tasks.all().filter(parent_task__isnull=True),
+        response["progress"] = project.progress
+        response["leaders"] = UserMinimalSerializer(project.leaders.all(), many=True).data
+        response["members"] = UserMinimalSerializer(project.members.all(), many=True).data
+        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
+        response["tasks"] = SubtaskViewSerializer(
+            project.tasks.filter(parent_task__isnull=True),
             many=True
         ).data
-        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
-        response["progress"] = project.progress
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -158,5 +158,5 @@ def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
             all_tasks |= _project.tasks.all()
 
     recurse_project(project)
-    serializer = TaskViewSerializer(all_tasks, many=True)
+    serializer = SubtaskViewSerializer(all_tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
