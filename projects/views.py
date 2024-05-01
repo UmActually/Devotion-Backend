@@ -72,12 +72,14 @@ class ProjectView(APIView):
         response = serializer.data
 
         response["breadcrumbs"] = get_project_breadcrumbs(project)
-        response["tasks"] = TaskViewSerializer(
-            project.tasks.all().filter(parent_task__isnull=True),
+        response["progress"] = project.progress
+        response["leaders"] = UserMinimalSerializer(project.leaders.all(), many=True).data
+        response["members"] = UserMinimalSerializer(project.members.all(), many=True).data
+        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
+        response["tasks"] = SubtaskViewSerializer(
+            project.tasks.filter(parent_task__isnull=True),
             many=True
         ).data
-        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
-        response["progress"] = project.progress
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -166,5 +168,5 @@ def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
             all_tasks |= _project.tasks.all()
 
     recurse_project(project)
-    serializer = TaskViewSerializer(all_tasks, many=True)
+    serializer = SubtaskViewSerializer(all_tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

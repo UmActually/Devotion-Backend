@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from devotion.apis import delete_event, GoogleAPIException
 from .models import Task, TaskStatus
-from .serializers import TaskSerializer, TaskViewSerializer, TaskDeserializer
+from .serializers import TaskSerializer, TaskViewSerializer, SubtaskViewSerializer, TaskDeserializer
 
 
 def bad_request(message: str) -> Response:
@@ -86,7 +86,7 @@ class TaskView(APIView):
         response = serializer.data
 
         response["breadcrumbs"] = get_task_breadcrumbs(task)
-        response["tasks"] = TaskViewSerializer(task.tasks.all(), many=True).data
+        response["tasks"] = SubtaskViewSerializer(task.tasks.all(), many=True).data
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -222,5 +222,5 @@ def get_all_subtree_tasks(_request: Request, task_id: str) -> Response:
             all_tasks |= _task.tasks.all()
 
     recurse_task(task)
-    serializer = TaskViewSerializer(all_tasks, many=True)
+    serializer = SubtaskViewSerializer(all_tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
