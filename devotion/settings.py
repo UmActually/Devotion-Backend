@@ -31,24 +31,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 def read_env_file(name: str) -> str:
     with open(BASE_DIR / ".env") as file:
-        for line in file.read().split("\n"):
+        for line in file.read().split(";\n"):
             if line.startswith(name) and "='" in line:
-                return line.split("='")[1][:-1]
+                return line.split("='")[1].strip("';\n")
         else:
             raise KeyError(f"'{name}' no se encuentra en el archivo .env")
 
 
 def env_variable(name: str) -> str:
     try:
-        return os.environ[name].replace("'", "")
+        return os.environ[name].strip("';")
     except KeyError:
         return read_env_file(name)
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env_variable("SECRET_KEY")
 
 ALLOWED_HOSTS = [
@@ -179,7 +175,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'auth.google_jwt_auth.GoogleJWTAuthentication',
+        'devotion.auth.GoogleJWTAuthentication',
     ),
 }
 
