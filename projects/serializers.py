@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from dashboards.models import Dashboard
 
-from global_serializers import CCModelSerializer
+from devotion.apis import create_calendar, update_calendar
+from devotion.serializers import CCModelSerializer
 from users.models import User
 from .models import Project
 
@@ -39,6 +40,7 @@ class ProjectDeserializer(serializers.Serializer):
     def validate(self, attrs):
         is_subproject = "parent" in attrs or (
             self.instance is not None and self.instance.parent_id is not None)
+        self.context["is_subproject"] = is_subproject
 
         leaders = attrs["leaders"].split(",") if "leaders" in attrs else []
         members = attrs["members"].split(",") if "members" in attrs else []
@@ -72,15 +74,48 @@ class ProjectDeserializer(serializers.Serializer):
         if "parent" in validated_data:
             project.parent_id = validated_data["parent"]
             project.save()
+        else:
+            create_calendar(project)
 
         Dashboard.objects.create(project=project)
+
         return project
 
     def update(self, instance, validated_data):
+        old_leader_emails = set()
+        old_member_emails = set()
+
+        if "leaders" in validated_data or "members" in validated_data:
+            old_leaders = instance.leaders.all()
+            old_members = instance.members.all()
+            old_leader_emails = set(map(lambda x: x.email, old_leaders))
+            old_member_emails = set(map(lambda x: x.email, old_members))
+
+            if "leaders" in validated_data:
+                validated_data["leaders"] = set(validated_data["leaders"].split(","))
+            else:
+                validated_data["leaders"] = set(map(lambda x: str(x.id), old_leaders))
+
+            if "members" in validated_data:
+                validated_data["members"] = set(validated_data["members"].split(","))
+            else:
+                validated_data["members"] = set(map(lambda x: str(x.id), old_members))
+
+            validated_data["members"] = validated_data["members"].union(validated_data["leaders"])
+
         for attr, value in validated_data.items():
             if attr in ("leaders", "members"):
-                getattr(instance, attr).set(set(value.split(",")))
+                getattr(instance, attr).set(value)
             else:
                 setattr(instance, attr, value)
+
         instance.save()
+
+        update_calendar(
+            instance,
+            validated_data.keys(),
+            old_leaders=old_leader_emails,
+            old_members=old_member_emails
+        )
+
         return instance

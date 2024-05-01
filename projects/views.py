@@ -6,10 +6,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from users.serializers import UserSerializer, UserMinimalSerializer
+from devotion.apis import delete_calendar, GoogleAPIException
+from users.serializers import UserSerializer
+from tasks.serializers import TaskViewSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
-from tasks.serializers import SubtaskViewSerializer
 
 
 @api_view(["POST"])
@@ -116,7 +117,16 @@ class ProjectView(APIView):
                 {"message": "No eres líder de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
 
+        calendar_id = project.calendar_id
         project.delete()
+
+        try:
+            delete_calendar(calendar_id)
+        except GoogleAPIException:
+            return Response(
+                {"message": "Error al eliminar el calendario."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

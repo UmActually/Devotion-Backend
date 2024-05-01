@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+from devotion.apis import delete_event, GoogleAPIException
 from .models import Task, TaskStatus
 from .serializers import TaskSerializer, TaskViewSerializer, SubtaskViewSerializer, TaskDeserializer
 
@@ -140,6 +141,12 @@ class TaskView(APIView):
             parent_project.progress -= 100
         parent_project.progress /= task_count
         parent_project.save()
+
+        try:
+            delete_event(task)
+        except GoogleAPIException:
+            return Response(
+                {"message": "Error al eliminar el evento."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

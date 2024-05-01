@@ -1,6 +1,7 @@
 import datetime
 from rest_framework import serializers
-from global_serializers import CCModelSerializer
+from devotion.apis import create_event, update_event
+from devotion.serializers import CCModelSerializer
 from projects.models import Project
 from users.serializers import UserMinimalSerializer
 from .models import Task, TaskStatus, TaskPriority
@@ -116,6 +117,8 @@ class TaskDeserializer(serializers.Serializer):
         parent_project.progress *= task_count
         parent_project.progress /= task_count + 1
         parent_project.save()
+
+        create_event(task)
         return task
 
     def update(self, instance, validated_data):
@@ -123,5 +126,7 @@ class TaskDeserializer(serializers.Serializer):
             if attr in ("parent_project", "parent_task", "asignee"):
                 attr += "_id"
             setattr(instance, attr, value)
+
         instance.save()
+        update_event(instance, validated_data.keys())
         return instance
