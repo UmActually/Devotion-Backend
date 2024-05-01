@@ -2,6 +2,7 @@ import datetime
 from rest_framework import serializers
 from global_serializers import CCModelSerializer
 from projects.models import Project
+from users.serializers import UserMinimalSerializer
 from .models import Task, TaskStatus, TaskPriority
 
 
@@ -31,6 +32,15 @@ class TaskSerializer(CCModelSerializer):
 
 
 class TaskViewSerializer(CCModelSerializer):
+    asignee = UserMinimalSerializer()
+
+    class Meta:
+        model = Task
+        fields = ("id", "name", "description", "status", "priority",
+                  "start_date", "due_date", "asignee", "parent_project", "parent_task")
+
+
+class SubtaskViewSerializer(CCModelSerializer):
     asignee = serializers.StringRelatedField()
 
     class Meta:

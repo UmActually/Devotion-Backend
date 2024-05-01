@@ -14,6 +14,17 @@ class UserSerializer(CCModelSerializer):
         }
 
 
+class UserMinimalSerializer(CCModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ("id", "name")
+
+    def get_name(self, obj):
+        return f"{obj.first_names} {obj.last_names}"
+
+
 class UserDeserializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
