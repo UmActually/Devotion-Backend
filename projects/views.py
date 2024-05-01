@@ -1,14 +1,14 @@
 from django.db.models.query import QuerySet
-from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 from devotion.apis import delete_calendar, GoogleAPIException
-from users.serializers import UserSerializer
-from tasks.serializers import TaskViewSerializer
+from users.serializers import UserSerializer, UserMinimalSerializer
+from tasks.serializers import SubtaskViewSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 
