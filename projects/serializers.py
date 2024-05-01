@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from dashboards.models import Dashboard
 
 from devotion.apis import create_calendar, update_calendar
 from devotion.serializers import CCModelSerializer
 from users.models import User
+from dashboards.models import Dashboard
 from .models import Project
 
 

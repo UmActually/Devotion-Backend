@@ -1,10 +1,10 @@
 from django.db.models.query import QuerySet
-from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 from devotion.apis import delete_event, GoogleAPIException
 from .models import Task, TaskStatus

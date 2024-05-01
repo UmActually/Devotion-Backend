@@ -1,5 +1,7 @@
 import datetime
+
 from rest_framework import serializers
+
 from devotion.apis import create_event, update_event
 from devotion.serializers import CCModelSerializer
 from projects.models import Project
