@@ -1,6 +1,9 @@
 import datetime
+from typing import Any, Iterable
 
+import pytz
 from rest_framework import serializers
+from rest_framework.response import Response
 
 from devotion.apis import create_event, update_event
 from devotion.serializers import CCModelSerializer
@@ -50,6 +53,12 @@ class SubtaskViewSerializer(CCModelSerializer):
         model = Task
         fields = ("id", "name", "description", "status", "priority",
                   "start_date", "due_date", "asignee", "parent_project", "parent_task")
+
+
+class SubtaskCalendarSerializer(CCModelSerializer):
+    class Meta:
+        model = Task
+        fields = ("id", "name", "status", "priority")
 
 
 class TaskDeserializer(serializers.Serializer):
@@ -132,3 +141,62 @@ class TaskDeserializer(serializers.Serializer):
         instance.save()
         update_event(instance, validated_data.keys())
         return instance
+
+
+def _group_tasks_as_calendar(tasks: Iterable[Task], start_date: datetime.date) -> list[list[dict[str, Any]]]:
+    date = start_date
+    data = [[{"date": "", "tasks": []} for _ in range(7)] for _ in range(5)]
+
+    for week in data:
+        for day in week:
+            day["date"] = date.isoformat()
+            date += datetime.timedelta(days=1)
+
+    date = start_date
+    week = 0
+    weekday = 0
+
+    # Y EN TIEMPO LINEAL PAPITO QUE MAS QUIERES
+    for task in tasks:
+        day_difference = (task.due_date - date).days
+        if day_difference != 0:
+            date = task.due_date
+            week += (weekday + day_difference) // 7
+            weekday = (weekday + day_difference) % 7
+        data[week][weekday]["tasks"].append(TaskViewSerializer(task).data)
+
+    return data
+
+
+def group_tasks_as_calendar(tasks: Iterable[Task], start_date: datetime.date) -> list[dict[str, Any]]:
+    data = {}
+
+    # Y EN TIEMPO LINEAL PAPITO QUE MAS QUIERES
+    for task in tasks:
+        days_difference = (task.due_date - start_date).days
+        calendar_row = days_difference // 7
+        calendar_col = days_difference % 7
+        if (calendar_row, calendar_col) not in data:
+            data[(calendar_row, calendar_col)] = []
+        data[(calendar_row, calendar_col)].append(SubtaskCalendarSerializer(task).data)
+
+    return [
+        {"date": key, "tasks": value}
+        for key, value in data.items()
+    ]
+
+
+def calendar_view_type(response: Response, project_or_task: Project | Task) -> None:
+    today = datetime.datetime.now(pytz.timezone("Mexico/General")).date()
+    days_difference = today.weekday() + 8
+    start_date = today - datetime.timedelta(days=days_difference)
+    end_date = start_date + datetime.timedelta(days=35)
+    tasks = project_or_task.tasks.filter(
+        parent_task__isnull=True,
+        due_date__gte=start_date,
+        due_date__lt=end_date
+    ).order_by("due_date")
+    response["tasks"] = group_tasks_as_calendar(tasks, start_date)
+    today_row = days_difference // 7
+    today_col = days_difference % 7
+    response["today"] = [today_row, today_col]

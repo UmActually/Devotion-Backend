@@ -4,7 +4,7 @@ from time import sleep
 import requests
 
 
-BASE_URL = "https://devotion-450983c14f36.herokuapp.com/"
+BASE_URL = "http://localhost:8000/"
 
 
 class HTTPException(Exception):
@@ -126,3 +126,22 @@ def create_task_(
         asignee: str, due_date: datetime.date, start_date: datetime.date | None = None,
         parent_task: str | None = None, priority: int | None = None) -> str:
     return str(uuid.uuid4())
+
+
+def update_task_dates(
+        user_token: str, task_id: str, due_date: datetime.date,
+        start_date: datetime.date | None = None) -> str:
+    endpoint = f"tasks/{task_id}"
+
+    r = requests.put(BASE_URL + endpoint, headers={
+        "Authorization": "Bearer " + user_token
+    }, data={
+        "due_date": due_date.strftime("%Y-%m-%d"),
+        "start_date": start_date.strftime("%Y-%m-%d") if start_date else None
+    })
+
+    if not r:
+        raise HTTPException(r)
+
+    json = r.json()
+    return json["id"]

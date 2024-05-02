@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -7,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from devotion.apis import delete_calendar, GoogleAPIException
+from tasks.serializers import SubtaskViewSerializer, calendar_view_type
 from users.serializers import UserSerializer, UserMinimalSerializer
-from tasks.serializers import SubtaskViewSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 
@@ -61,25 +63,35 @@ class ProjectView(APIView):
             return []
         return [IsAuthenticated()]
 
-    def get(self, _request: Request, project_id: str) -> Response:
+    def get(self, request: Request, project_id: str) -> Response:
         """Obtiene la información de un proyecto."""
         try:
             project = Project.objects.get(id=project_id)
         except Project.DoesNotExist:
             return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = ProjectSerializer(project)
-        response = serializer.data
+        view_type = request.query_params.get("view", "table")
+        partial_response = request.query_params.get("partial", "false") == "true"
 
-        response["breadcrumbs"] = get_project_breadcrumbs(project)
-        response["progress"] = project.progress
-        response["leaders"] = UserMinimalSerializer(project.leaders.all(), many=True).data
-        response["members"] = UserMinimalSerializer(project.members.all(), many=True).data
-        response["projects"] = ProjectSerializer(project.projects.all(), many=True).data
-        response["tasks"] = SubtaskViewSerializer(
-            project.tasks.filter(parent_task__isnull=True),
-            many=True
-        ).data
+        if partial_response:
+            response = {}
+        else:
+            response = ProjectSerializer(project).data
+            response.update({
+                "breadcrumbs": get_project_breadcrumbs(project),
+                "progress": project.progress,
+                "leaders": UserMinimalSerializer(project.leaders.all(), many=True).data,
+                "members": UserMinimalSerializer(project.members.all(), many=True).data,
+                "projects": ProjectSerializer(project.projects.all(), many=True).data
+            })
+
+        if view_type == "calendar":
+            calendar_view_type(response, project)
+        else:
+            response["tasks"] = SubtaskViewSerializer(
+                project.tasks.filter(parent_task__isnull=True),
+                many=True
+            ).data
 
         return Response(response, status=status.HTTP_200_OK)
 

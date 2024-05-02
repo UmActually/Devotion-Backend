@@ -2,7 +2,7 @@ import json
 import datetime
 import getpass
 from time import sleep
-from random import randint, choice, sample
+from random import randint, choice, sample, shuffle
 import faker
 import api
 
@@ -146,9 +146,27 @@ def populate_fsae_friendly() -> None:
         }, f_, indent=2)
 
 
-def populate_random() -> None:
-    pass
+def regenerate_task_dates() -> None:
+    global admin_token
+    with open("fsae_friendly_data.json") as f_:
+        data = json.load(f_)
+
+    if not admin_token:
+        print("Make sure an admin user exists.")
+        admin_email = input("Admin email: ")
+        admin_password = getpass.getpass("Admin password: ")
+        admin_token = api.login(admin_email, admin_password)
+
+    all_tasks = data["tasks"]
+    shuffle(all_tasks)
+    for task_id, name in all_tasks:
+        start_date = fake.date_between('-2w', '+1M')
+        due_date = start_date + datetime.timedelta(days=randint(1, 60))
+        api.update_task_dates(admin_token, task_id, start_date, due_date)
+        print(name, start_date, due_date)
+        sleep(1.5)
 
 
 if __name__ == "__main__":
-    populate_fsae_friendly()
+    # populate_fsae_friendly()
+    regenerate_task_dates()

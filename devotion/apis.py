@@ -27,7 +27,7 @@ def is_tec_email(email: str) -> bool:
 
 def acl_callback(_request_id, _response, exception) -> None:
     if exception is not None:
-        raise serializers.ValidationError("Error al actualizar permisos en el calendario.")
+        print("Error al actualizar permisos en el calendario.", exception)
 
 
 def get_calendar_id(task: "Task") -> str:
@@ -96,8 +96,8 @@ def _update_calendar_info(project: "Project", modified_data: Iterable[str]) -> N
         body["description"] = project.description
     try:
         google_api.calendars().patch(calendarId=project.calendar_id, body=body).execute()
-    except GoogleAPIException:
-        raise serializers.ValidationError("Error al actualizar la información del calendario.")
+    except GoogleAPIException as e:
+        print("Error al actualizar la información del calendario.", e)
 
 
 def _update_calendar_acl(project: "Project", **kwargs: set[str]) -> None:
@@ -179,8 +179,9 @@ def create_event(task: "Task") -> None:
                 "description": task.description
             }
         ).execute()["id"]
-    except GoogleAPIException:
-        raise serializers.ValidationError("Error al crear el evento.")
+    except GoogleAPIException as e:
+        print("Error al crear el evento.", e)
+        event_id = "Mi Evento Loco"
 
     task.event_id = event_id
     task.save()
@@ -205,8 +206,7 @@ def update_event(task: "Task", modified_data: Iterable[str]) -> None:
             body=body
         ).execute()
     except GoogleAPIException as e:
-        print(e)
-        raise serializers.ValidationError("Error al actualizar el evento.")
+        print("Error al actualizar el evento.", e)
 
 
 def delete_event(task: "Task") -> None:

@@ -8,7 +8,9 @@ from rest_framework.views import APIView
 
 from devotion.apis import delete_event, GoogleAPIException
 from .models import Task, TaskStatus
-from .serializers import TaskSerializer, TaskViewSerializer, SubtaskViewSerializer, TaskDeserializer
+from .serializers import (
+    TaskSerializer, TaskViewSerializer, SubtaskViewSerializer,
+    TaskDeserializer, calendar_view_type)
 
 
 def bad_request(message: str) -> Response:
@@ -75,18 +77,26 @@ class TaskView(APIView):
             return []
         return [IsAuthenticated()]
 
-    def get(self, _request: Request, task_id: str) -> Response:
+    def get(self, request: Request, task_id: str) -> Response:
         """Obtiene la información de una tarea."""
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
             return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = TaskViewSerializer(task)
-        response = serializer.data
+        view_type = request.query_params.get("view", "table")
+        partial_response = request.query_params.get("partial", "false") == "true"
 
-        response["breadcrumbs"] = get_task_breadcrumbs(task)
-        response["tasks"] = SubtaskViewSerializer(task.tasks.all(), many=True).data
+        if partial_response:
+            response = {}
+        else:
+            response = TaskViewSerializer(task).data
+            response["breadcrumbs"] = get_task_breadcrumbs(task)
+
+        if view_type == "calendar":
+            calendar_view_type(response, task)
+        else:
+            response["tasks"] = SubtaskViewSerializer(task.tasks.all(), many=True).data
 
         return Response(response, status=status.HTTP_200_OK)
 
