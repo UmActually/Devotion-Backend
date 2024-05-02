@@ -27,7 +27,7 @@ class Task(models.Model):
         "projects.Project", on_delete=models.CASCADE, null=False, blank=False, related_name="tasks")
     parent_task = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, blank=True, related_name="tasks")
-    asignee = models.ForeignKey(
+    assignee = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, null=False, blank=False, related_name="tasks")
     event_id = models.CharField(max_length=32, null=False, blank=False)
 

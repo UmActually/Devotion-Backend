@@ -97,7 +97,7 @@ def create_project_(
 
 def create_task(
         user_token: str, name: str, description: str, parent_project: str,
-        asignee: str, due_date: datetime.date, start_date: datetime.date | None = None,
+        assignee: str, due_date: datetime.date, start_date: datetime.date | None = None,
         parent_task: str | None = None, priority: int | None = None) -> str:
     endpoint = "tasks/"
 
@@ -107,7 +107,7 @@ def create_task(
         "name": name,
         "description": description,
         "parent_project": parent_project,
-        "asignee": asignee,
+        "assignee": assignee,
         "due_date": due_date.strftime("%Y-%m-%d"),
         "start_date": start_date.strftime("%Y-%m-%d") if start_date else None,
         "parent_task": parent_task,
@@ -123,7 +123,7 @@ def create_task(
 
 def create_task_(
         user_token: str, name: str, description: str, parent_project: str,
-        asignee: str, due_date: datetime.date, start_date: datetime.date | None = None,
+        assignee: str, due_date: datetime.date, start_date: datetime.date | None = None,
         parent_task: str | None = None, priority: int | None = None) -> str:
     return str(uuid.uuid4())
 
