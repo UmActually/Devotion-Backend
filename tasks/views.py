@@ -31,7 +31,7 @@ def create_task(request: Request) -> Response:
     - due_date
     - parent_project
     - parent_task (opcional)
-    - asignee
+    - assignee
     """
     data = request.data
     serializer = TaskDeserializer(data=data)
@@ -183,7 +183,7 @@ def update_task_status(request: Request, task_id: str) -> Response:
     user = request.user
     parent_project = task.parent_project
     is_leader = user.is_superuser or user in parent_project.leaders.all()
-    if user != task.asignee and not is_leader:
+    if user != task.assignee and not is_leader:
         return Response(
             {"message": "No eres el asignado de esta tarea, o líder del proyecto."},
             status=status.HTTP_403_FORBIDDEN)

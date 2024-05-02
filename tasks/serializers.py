@@ -26,8 +26,8 @@ def get_task_or_error(task_id: str) -> Task:
         raise serializers.ValidationError("La tarea papá no existe.")
 
 
-def check_project_membership(asignee_id: str, project: Project) -> None:
-    if asignee_id not in map(lambda m: str(m.id), project.members.all()):
+def check_project_membership(assignee_id: str, project: Project) -> None:
+    if assignee_id not in map(lambda m: str(m.id), project.members.all()):
         raise serializers.ValidationError("El asignado no pertenece al proyecto papá.")
 
 
@@ -38,21 +38,21 @@ class TaskSerializer(CCModelSerializer):
 
 
 class TaskViewSerializer(CCModelSerializer):
-    asignee = UserMinimalSerializer()
+    assignee = UserMinimalSerializer()
 
     class Meta:
         model = Task
         fields = ("id", "name", "description", "status", "priority",
-                  "start_date", "due_date", "asignee", "parent_project", "parent_task")
+                  "start_date", "due_date", "assignee", "parent_project", "parent_task")
 
 
 class SubtaskViewSerializer(CCModelSerializer):
-    asignee = serializers.StringRelatedField()
+    assignee = serializers.StringRelatedField()
 
     class Meta:
         model = Task
         fields = ("id", "name", "description", "status", "priority",
-                  "start_date", "due_date", "asignee", "parent_project", "parent_task")
+                  "start_date", "due_date", "assignee", "parent_project", "parent_task")
 
 
 class SubtaskCalendarSerializer(CCModelSerializer):
@@ -69,7 +69,7 @@ class TaskDeserializer(serializers.Serializer):
     due_date = serializers.DateField(required=True)
     parent_project = serializers.CharField(required=True)
     parent_task = serializers.CharField(required=False)
-    asignee = serializers.CharField(required=True)
+    assignee = serializers.CharField(required=True)
 
     def validate(self, attrs):
         # TODO: En teoría, falta revisar que no se haga un ciclo en
@@ -88,8 +88,8 @@ class TaskDeserializer(serializers.Serializer):
             if parent_task.parent_project_id != parent_project.id:
                 raise serializers.ValidationError("La nueva tarea papá no pertenece al mismo proyecto.")
 
-        asignee_id = attrs.get("asignee") or str(self.instance.asignee_id)
-        check_project_membership(asignee_id, parent_project)
+        assignee_id = attrs.get("assignee") or str(self.instance.assignee_id)
+        check_project_membership(assignee_id, parent_project)
 
         if "priority" in attrs and attrs["priority"] not in TaskPriority.values:
             raise serializers.ValidationError("Valor de prioridad inválido.")
@@ -122,7 +122,7 @@ class TaskDeserializer(serializers.Serializer):
             due_date=validated_data["due_date"],
             parent_project_id=validated_data["parent_project"],
             parent_task_id=validated_data.get("parent_task"),
-            asignee_id=validated_data["asignee"]
+            assignee_id=validated_data["assignee"]
         )
 
         parent_project.progress *= task_count
@@ -134,7 +134,7 @@ class TaskDeserializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
-            if attr in ("parent_project", "parent_task", "asignee"):
+            if attr in ("parent_project", "parent_task", "assignee"):
                 attr += "_id"
             setattr(instance, attr, value)
 

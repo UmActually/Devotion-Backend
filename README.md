@@ -209,7 +209,7 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
       "priority": 0,
       "startDate": "2024-02-13",
       "dueDate": "2024-02-21",
-      "asignee": "Alexander Albon",
+      "assignee": "Alexander Albon",
       "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
       "parentTask": null
     },
@@ -253,7 +253,7 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
     "priority": 0,
     "startDate": "2024-02-13",
     "dueDate": "2024-02-21",
-    "asignee": "Alexander Albon",
+    "assignee": "Alexander Albon",
     "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
     "parentTask": null
   },
@@ -294,7 +294,7 @@ TODO: Falta implementar.
 - `due_date` - _Formato YYYY-MM-DD_
 - `parent_project` - _ID del proyecto papá_
 - `parent_task` (opcional) - _ID de la tarea papá_
-- `asignee` - _ID del usuario asignado_
+- `assignee` - _ID del usuario asignado_
 
 ---
 
@@ -311,7 +311,7 @@ TODO: Falta implementar.
   "priority": 0,
   "startDate": "2024-02-13",
   "dueDate": "2024-02-21",
-  "asignee": "Alexander Albon",
+  "assignee": "Alexander Albon",
   "breadcrumbs": [
     [
       "4bfca576-83d2-447a-9b79-cdc778417c84",
@@ -329,7 +329,7 @@ TODO: Falta implementar.
       "priority": 0,
       "startDate": "2024-02-13",
       "dueDate": "2024-02-21",
-      "asignee": "Alexander Albon",
+      "assignee": "Alexander Albon",
       "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
       "parentTask": null
     },
@@ -354,7 +354,7 @@ TODO: Falta implementar.
     "priority": 0,
     "startDate": "2024-02-13",
     "dueDate": "2024-02-21",
-    "asignee": "Alexander Albon",
+    "assignee": "Alexander Albon",
     "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
     "parentTask": null
   },
@@ -377,7 +377,7 @@ TODO: Falta implementar.
 - `due_date` (opcional) - _Formato YYYY-MM-DD_
 - `parent_project` (opcional) - _ID del proyecto papá_
 - `parent_task` (opcional) - _ID de la tarea papá_
-- `asignee` (opcional) - _ID del usuario asignado_
+- `assignee` (opcional) - _ID del usuario asignado_
 
 ---
 

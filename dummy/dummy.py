@@ -93,7 +93,7 @@ def create_tree_item(
                 user_token=admin_token,
                 name=stripped_line,
                 description=short_lipsum,
-                asignee=choice(members),
+                assignee=choice(members),
                 start_date=start_date,
                 due_date=due_date,
                 priority=randint(0, 2),
