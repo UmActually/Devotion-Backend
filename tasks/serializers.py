@@ -61,6 +61,14 @@ class SubtaskCalendarSerializer(CCModelSerializer):
         fields = ("id", "name", "status", "priority")
 
 
+class SubtaskKanbanSerializer(CCModelSerializer):
+    assignee = UserMinimalSerializer()
+
+    class Meta:
+        model = Task
+        fields = ("id", "name", "description", "priority", "assignee")
+
+
 class TaskDeserializer(serializers.Serializer):
     name = serializers.CharField(max_length=128, required=True)
     description = serializers.CharField(max_length=1024, required=False)
@@ -183,10 +191,14 @@ def kanban_view_type(response: Response, project_or_task: Project | Task) -> Non
         tasks = project_or_task.tasks.all()
     else:
         tasks = project_or_task.tasks.filter(parent_task__isnull=True)
-    tasks = tasks.order_by("status", "priority")
-    response["tasks"] = {
+    tasks = tasks.order_by("status", "-priority")
+    tasks = {
         "notStarted": tasks.filter(status=TaskStatus.NOT_STARTED),
         "inProgress": tasks.filter(status=TaskStatus.IN_PROGRESS),
         "inReview": tasks.filter(status=TaskStatus.IN_REVIEW),
         "done": tasks.filter(status=TaskStatus.DONE)
+    }
+    response["tasks"] = {
+        key: SubtaskKanbanSerializer(value, many=True).data
+        for key, value in tasks.items()
     }
