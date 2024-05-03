@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from projects.serializers import ProjectSerializer
 from .models import User
-from .serializers import UserSerializer, UserDeserializer
+from .serializers import UserSerializer, UserMinimalSerializer, UserDeserializer
 
 
 @api_view(["GET"])
@@ -50,7 +50,7 @@ class UsersView(APIView):
     def get(self, _request: Request) -> Response:
         """Obtiene todos los usuarios"""
         users = User.objects.filter(is_superuser=False)
-        serializer = UserSerializer(users, many=True)
+        serializer = UserMinimalSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
