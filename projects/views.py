@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from devotion.apis import delete_calendar, GoogleAPIException
 from tasks.serializers import SubtaskViewSerializer, calendar_view_type, kanban_view_type
-from users.serializers import UserSerializer, UserMinimalSerializer
+from users.serializers import UserSerializer, UserMinimalSerializer, UserRoleSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 
@@ -159,7 +159,7 @@ def get_project_members(request: Request, project_id: str) -> Response:
             {"message": "No eres miembro de este proyecto."},
             status=status.HTTP_403_FORBIDDEN)
 
-    serializer = UserSerializer(members, many=True)
+    serializer = UserRoleSerializer(members, many=True, context={"project": project})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
