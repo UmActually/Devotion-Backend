@@ -1,5 +1,3 @@
-import datetime
-
 from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -9,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from devotion.apis import delete_calendar, GoogleAPIException
-from tasks.serializers import SubtaskViewSerializer, calendar_view_type
-from users.serializers import UserSerializer, UserMinimalSerializer
+from tasks.serializers import SubtaskViewSerializer, calendar_view_type, kanban_view_type
+from users.serializers import UserSerializer, UserMinimalSerializer, UserRoleSerializer
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 
@@ -87,6 +85,8 @@ class ProjectView(APIView):
 
         if view_type == "calendar":
             calendar_view_type(response, project)
+        elif view_type == "kanban":
+            kanban_view_type(response, project)
         else:
             response["tasks"] = SubtaskViewSerializer(
                 project.tasks.filter(parent_task__isnull=True),
@@ -159,7 +159,7 @@ def get_project_members(request: Request, project_id: str) -> Response:
             {"message": "No eres miembro de este proyecto."},
             status=status.HTTP_403_FORBIDDEN)
 
-    serializer = UserSerializer(members, many=True)
+    serializer = UserRoleSerializer(members, many=True, context={"project": project})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

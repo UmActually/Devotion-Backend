@@ -25,6 +25,21 @@ class UserMinimalSerializer(CCModelSerializer):
         return f"{obj.first_names} {obj.last_names}"
 
 
+class UserRoleSerializer(CCModelSerializer):
+    name = serializers.SerializerMethodField()
+    is_leader = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ("id", "email", "name", "is_leader")
+
+    def get_name(self, obj):
+        return f"{obj.first_names} {obj.last_names}"
+
+    def get_is_leader(self, obj):
+        return obj in self.context["project"].leaders.all()
+
+
 class UserDeserializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)

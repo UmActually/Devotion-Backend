@@ -87,7 +87,7 @@ def create_tree_item(
 
         # Tarea
         else:
-            start_date = fake.date_this_year()
+            start_date = fake.date_between('-2w', '+1M')
             due_date = start_date + datetime.timedelta(days=randint(1, 60))
             task_id = api.create_task(
                 user_token=admin_token,
@@ -168,5 +168,5 @@ def regenerate_task_dates() -> None:
 
 
 if __name__ == "__main__":
-    # populate_fsae_friendly()
-    regenerate_task_dates()
+    populate_fsae_friendly()
+    # regenerate_task_dates()

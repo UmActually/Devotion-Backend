@@ -10,7 +10,7 @@ from devotion.apis import delete_event, GoogleAPIException
 from .models import Task, TaskStatus
 from .serializers import (
     TaskSerializer, TaskViewSerializer, SubtaskViewSerializer,
-    TaskDeserializer, calendar_view_type)
+    TaskDeserializer, calendar_view_type, kanban_view_type)
 
 
 def bad_request(message: str) -> Response:
@@ -95,6 +95,8 @@ class TaskView(APIView):
 
         if view_type == "calendar":
             calendar_view_type(response, task)
+        elif view_type == "kanban":
+            kanban_view_type(response, task)
         else:
             response["tasks"] = SubtaskViewSerializer(task.tasks.all(), many=True).data
 

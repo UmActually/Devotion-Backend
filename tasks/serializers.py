@@ -61,6 +61,14 @@ class SubtaskCalendarSerializer(CCModelSerializer):
         fields = ("id", "name", "status", "priority")
 
 
+class SubtaskKanbanSerializer(CCModelSerializer):
+    assignee = UserMinimalSerializer()
+
+    class Meta:
+        model = Task
+        fields = ("id", "name", "description", "priority", "assignee")
+
+
 class TaskDeserializer(serializers.Serializer):
     name = serializers.CharField(max_length=128, required=True)
     description = serializers.CharField(max_length=1024, required=False)
@@ -143,31 +151,6 @@ class TaskDeserializer(serializers.Serializer):
         return instance
 
 
-def _group_tasks_as_calendar(tasks: Iterable[Task], start_date: datetime.date) -> list[list[dict[str, Any]]]:
-    date = start_date
-    data = [[{"date": "", "tasks": []} for _ in range(7)] for _ in range(5)]
-
-    for week in data:
-        for day in week:
-            day["date"] = date.isoformat()
-            date += datetime.timedelta(days=1)
-
-    date = start_date
-    week = 0
-    weekday = 0
-
-    # Y EN TIEMPO LINEAL PAPITO QUE MAS QUIERES
-    for task in tasks:
-        day_difference = (task.due_date - date).days
-        if day_difference != 0:
-            date = task.due_date
-            week += (weekday + day_difference) // 7
-            weekday = (weekday + day_difference) % 7
-        data[week][weekday]["tasks"].append(TaskViewSerializer(task).data)
-
-    return data
-
-
 def group_tasks_as_calendar(tasks: Iterable[Task], start_date: datetime.date) -> list[dict[str, Any]]:
     data = {}
 
@@ -200,3 +183,22 @@ def calendar_view_type(response: Response, project_or_task: Project | Task) -> N
     today_row = days_difference // 7
     today_col = days_difference % 7
     response["today"] = [today_row, today_col]
+
+
+def kanban_view_type(response: Response, project_or_task: Project | Task) -> None:
+    is_task = isinstance(project_or_task, Task)
+    if is_task:
+        tasks = project_or_task.tasks.all()
+    else:
+        tasks = project_or_task.tasks.filter(parent_task__isnull=True)
+    tasks = tasks.order_by("status", "-priority")
+    tasks = {
+        "notStarted": tasks.filter(status=TaskStatus.NOT_STARTED),
+        "inProgress": tasks.filter(status=TaskStatus.IN_PROGRESS),
+        "inReview": tasks.filter(status=TaskStatus.IN_REVIEW),
+        "done": tasks.filter(status=TaskStatus.DONE)
+    }
+    response["tasks"] = {
+        key: SubtaskKanbanSerializer(value, many=True).data
+        for key, value in tasks.items()
+    }
