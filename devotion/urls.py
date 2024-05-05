@@ -20,6 +20,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 import users.views as users
 import projects.views as projects
 import tasks.views as tasks
+import dashboards.views as dashboards
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -39,5 +40,7 @@ urlpatterns = [
     path("tasks/", tasks.create_task),
     path("tasks/<uuid:task_id>/", tasks.TaskView.as_view()),
     path("tasks/<uuid:task_id>/status/", tasks.update_task_status),
-    path("tasks/<uuid:task_id>/subtasks/", tasks.get_all_subtree_tasks)
+    path("tasks/<uuid:task_id>/subtasks/", tasks.get_all_subtree_tasks),
+
+    path("dashboards/<uuid:project_id>/", dashboards.DashboardView.as_view())
 ]
