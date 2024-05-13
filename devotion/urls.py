@@ -42,5 +42,12 @@ urlpatterns = [
     path("tasks/<uuid:task_id>/status/", tasks.update_task_status),
     path("tasks/<uuid:task_id>/subtasks/", tasks.get_all_subtree_tasks),
 
-    path("dashboards/<uuid:project_id>/", dashboards.DashboardView.as_view())
+    path("dashboards/<uuid:project_id>/", dashboards.DashboardView.as_view()),
+    path("widgets/", dashboards.create_widget),
+    # path("widgets/<uuid:widget_id>/", dashboards.WidgetView.as_view()),
+    path("all_widgets/", dashboards.get_all_widgets),
+
+    path("data_sources/", dashboards.create_data_source),
+    path("data_sources/<uuid:data_source_id>/", dashboards.DataSourceView.as_view()),
+    path("all_data_sources/", dashboards.get_all_data_sources),
 ]
