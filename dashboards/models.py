@@ -26,19 +26,9 @@ class Widget(models.Model):
     name = models.CharField(max_length=64, null=False, blank=False)
     display_type = models.SmallIntegerField(choices=WidgetDisplayType.choices, null=False, blank=False)
     data_source = models.ForeignKey('DataSource', on_delete=models.CASCADE, null=False, blank=False)
-    dashboard = models.ForeignKey('Dashboard', on_delete=models.CASCADE, null=False, blank=False)
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, null=False, blank=False)
     position = models.SmallIntegerField(null=False, blank=False)
     unit = models.CharField(max_length=16, null=True, blank=True)
 
     def __str__(self):
         return self.name
-
-
-class Dashboard(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    project = models.OneToOneField(
-        "projects.Project", on_delete=models.CASCADE, null=False, blank=False,
-        related_name="dashboard")
-
-    def __str__(self):
-        return self.project.name
