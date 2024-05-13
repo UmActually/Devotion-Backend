@@ -64,6 +64,9 @@ class CurrentUserView(APIView):
 
     def put(self, request: Request) -> Response:
         """Actualiza la información del usuario autenticado."""
+        if "profile_picture" in request.data and request.user.profile_picture == request.data["profile_picture"]:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         if "password" in request.data:
             return Response(
                 {"message": "No se puede actualizar la contraseña por este medio."},
