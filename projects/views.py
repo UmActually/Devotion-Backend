@@ -132,12 +132,13 @@ class ProjectView(APIView):
         calendar_id = project.calendar_id
         project.delete()
 
-        try:
-            delete_calendar(calendar_id)
-        except GoogleAPIException:
-            return Response(
-                {"message": "Error al eliminar el calendario."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if calendar_id:
+            try:
+                delete_calendar(calendar_id)
+            except GoogleAPIException:
+                return Response(
+                    {"message": "Error al eliminar el calendario."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
