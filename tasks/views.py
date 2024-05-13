@@ -148,10 +148,13 @@ class TaskView(APIView):
         task.delete()
 
         task_count = parent_project.tasks.count()
-        parent_project.progress *= task_count + 1
-        if task.status == TaskStatus.DONE:
-            parent_project.progress -= 100
-        parent_project.progress /= task_count
+        if task_count == 0:
+            parent_project.progress = 0
+        else:
+            parent_project.progress *= task_count + 1
+            if task.status == TaskStatus.DONE:
+                parent_project.progress -= 100
+            parent_project.progress /= task_count
         parent_project.save()
 
         try:
