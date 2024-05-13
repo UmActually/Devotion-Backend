@@ -74,12 +74,15 @@ class ProjectView(APIView):
         if partial_response:
             response = {}
         else:
+            project_context = {"project": project}
+            leaders = set(project.leaders.all())
+            members = set(project.members.all()) - leaders
             response = ProjectSerializer(project).data
             response.update({
                 "breadcrumbs": get_project_breadcrumbs(project),
                 "progress": project.progress,
-                "leaders": UserMinimalSerializer(project.leaders.all(), many=True).data,
-                "members": UserMinimalSerializer(project.members.all(), many=True).data,
+                "leaders": UserRoleSerializer(leaders, many=True, context=project_context).data,
+                "members": UserRoleSerializer(members, many=True, context=project_context).data,
                 "projects": ProjectSerializer(project.projects.all(), many=True).data
             })
 
