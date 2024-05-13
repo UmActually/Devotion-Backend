@@ -3,7 +3,6 @@ from rest_framework import serializers
 from devotion.apis import create_calendar, update_calendar
 from devotion.serializers import CCModelSerializer
 from users.models import User
-from dashboards.models import Dashboard
 from .models import Project
 
 
@@ -76,8 +75,6 @@ class ProjectDeserializer(serializers.Serializer):
             project.save()
         else:
             create_calendar(project)
-
-        Dashboard.objects.create(project=project)
 
         return project
 

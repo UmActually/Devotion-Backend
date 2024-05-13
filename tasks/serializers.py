@@ -69,6 +69,14 @@ class SubtaskKanbanSerializer(CCModelSerializer):
         fields = ("id", "name", "description", "priority", "assignee")
 
 
+class TaskDashboardSerializer(CCModelSerializer):
+    parent_project = serializers.StringRelatedField()
+    class Meta:
+        model = Task
+        fields = ("id", "name", "description", "priority",
+                  "due_date", "parent_project")
+
+
 class TaskDeserializer(serializers.Serializer):
     name = serializers.CharField(max_length=128, required=True)
     description = serializers.CharField(max_length=1024, required=False)

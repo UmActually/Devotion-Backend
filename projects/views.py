@@ -177,7 +177,7 @@ def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
         nonlocal all_tasks
         for subproject in _project.projects.all():
             recurse_project(subproject)
-            all_tasks |= _project.tasks.all()
+            all_tasks |= subproject.tasks.all()
 
     recurse_project(project)
     serializer = SubtaskViewSerializer(all_tasks, many=True)
