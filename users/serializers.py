@@ -31,7 +31,7 @@ class UserRoleSerializer(CCModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "email", "name", "is_leader")
+        fields = ("id", "email", "name", "is_leader", "profile_picture")
 
     def get_name(self, obj):
         return f"{obj.first_names} {obj.last_names}"
@@ -45,10 +45,14 @@ class UserDeserializer(serializers.Serializer):
     password = serializers.CharField(required=True)
     first_names = serializers.CharField(max_length=64, required=True)
     last_names = serializers.CharField(max_length=64, required=True)
+    profile_picture = serializers.URLField(required=False)
 
     def validate(self, attrs):
         if "email" in attrs and User.objects.filter(email=attrs["email"]).exists():
             raise serializers.ValidationError("Este correo ya está registrado.")
+        if "profile_picture" in attrs \
+                and not attrs["profile_picture"].startswith("https://lh3.googleusercontent.com/"):
+            raise serializers.ValidationError("La URL de la imagen de perfil debe ser válida.")
         return attrs
 
     def create(self, validated_data):
