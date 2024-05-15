@@ -3,13 +3,17 @@ from devotion.serializers import CCModelSerializer
 from .models import Widget, WidgetDisplayType, DataSource
 from tasks.serializers import get_project_or_error
 
+
 def get_data_source_or_error(data_source_id: str) -> DataSource:
     try:
         return DataSource.objects.get(id=data_source_id)
     except DataSource.DoesNotExist:
         raise serializers.ValidationError("La fuente de datos no existe.")
 
+
 class WidgetSerializer(CCModelSerializer):
+    data_source = serializers.StringRelatedField()
+
     class Meta:
         model = Widget
         fields = ("id", "name", "display_type", "data_source", "position", "unit")
@@ -32,13 +36,13 @@ class WidgetDeserializer(serializers.Serializer):
         self.context["data_source"] = get_data_source_or_error(attrs["data_source"])
 
         return attrs
-    
+
     def create(self, validated_data):
         validated_data["project"] = self.context["project"]
         validated_data["data_source"] = self.context["data_source"]
-        
+
         return Widget.objects.create(**validated_data)
-    
+
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             if attr in ("data_source", "project"):
@@ -47,13 +51,13 @@ class WidgetDeserializer(serializers.Serializer):
 
         instance.save()
         return instance
-    
+
 
 class DataSourceSerializer(CCModelSerializer):
     class Meta:
         model = DataSource
         fields = ("id", "name", "mqtt_topic")
-    
+
 
 class DataSourceDeserializer(serializers.Serializer):
     name = serializers.CharField(max_length=64, required=True)
@@ -67,11 +71,11 @@ class DataSourceDeserializer(serializers.Serializer):
     def create(self, validated_data):
         validated_data["project"] = self.context["project"]
         return DataSource.objects.create(**validated_data)
-    
+
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             if attr in ("project"):
                 attr += "_id"
             setattr(instance, attr, value)
         instance.save()
-        return instance 
+        return instance
