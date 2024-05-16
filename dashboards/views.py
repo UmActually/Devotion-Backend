@@ -160,6 +160,39 @@ class DataSourceView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class WidgetView(APIView):
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return []
+        return [IsAuthenticated()]
+
+    def delete(self, request: Request, widget_id: str) -> Response:
+        try:
+            widget = Widget.objects.get(id=widget_id)
+        except Widget.DoesNotExist:
+            return Response(
+                {"message": "El widget no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        widget.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request: Request, widget_id: str) -> Response:
+        try:
+            widget = Widget.objects.get(id=widget_id)
+        except Widget.DoesNotExist:
+            return Response(
+                {"message": "El widget no existe."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = WidgetDeserializer(data=request.data, instance=widget)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(["GET"])
 def get_all_data_sources(request) -> Response:
     return Response(

@@ -11,8 +11,42 @@ def get_data_source_or_error(data_source_id: str) -> DataSource:
         raise serializers.ValidationError("La fuente de datos no existe.")
 
 
+class DataSourceSerializer(CCModelSerializer):
+    class Meta:
+        model = DataSource
+        fields = ("id", "name", "mqtt_topic")
+
+
+class DataSourceMinimalSerializer(CCModelSerializer):
+    class Meta:
+        model = DataSource
+        fields = ("id", "name")
+
+
+class DataSourceDeserializer(serializers.Serializer):
+    name = serializers.CharField(max_length=64, required=True)
+    project = serializers.CharField(required=True)
+    mqtt_topic = serializers.CharField(max_length=64, required=True)
+
+    def validate(self, attrs):
+        self.context["project"] = get_project_or_error(attrs["project"])
+        return attrs
+
+    def create(self, validated_data):
+        validated_data["project"] = self.context["project"]
+        return DataSource.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr in ("project"):
+                attr += "_id"
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+
 class WidgetSerializer(CCModelSerializer):
-    data_source = serializers.StringRelatedField()
+    data_source = DataSourceMinimalSerializer()
 
     class Meta:
         model = Widget
@@ -49,33 +83,5 @@ class WidgetDeserializer(serializers.Serializer):
                 attr += "_id"
             setattr(instance, attr, value)
 
-        instance.save()
-        return instance
-
-
-class DataSourceSerializer(CCModelSerializer):
-    class Meta:
-        model = DataSource
-        fields = ("id", "name", "mqtt_topic")
-
-
-class DataSourceDeserializer(serializers.Serializer):
-    name = serializers.CharField(max_length=64, required=True)
-    project = serializers.CharField(required=True)
-    mqtt_topic = serializers.CharField(max_length=64, required=True)
-
-    def validate(self, attrs):
-        self.context["project"] = get_project_or_error(attrs["project"])
-        return attrs
-
-    def create(self, validated_data):
-        validated_data["project"] = self.context["project"]
-        return DataSource.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            if attr in ("project"):
-                attr += "_id"
-            setattr(instance, attr, value)
         instance.save()
         return instance
