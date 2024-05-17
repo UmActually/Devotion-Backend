@@ -27,13 +27,13 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
 - GET `/me/` - _[Obtener usuario ☆](#get-me---obtener-usuario-)_
 - PUT `/me/` - _[Actualizar usuario ☆](#put-me---actualizar-usuario-)_
 - GET `/me/projects/` - _[Obtener proyectos del usuario ☆](#get-meprojects---obtener-proyectos-del-usuario-)_
+- GET `/me/calendar/` - _[Obtener calendario global del usuario ☆](#get-mecalendar---obtener-calendario-global-del-usuario-)_
 
 **Projects**
 
 - POST `/projects/` - _[Crear proyecto ☆](#post-projects---crear-proyecto-)_
 - GET `/projects/<id>/` - _[Obtener proyecto](#get-projectsid---obtener-proyecto)_
 - GET `/projects/<id>/members/` - _[Obtener miembros del proyecto ☆](#get-projectsidmembers---obtener-miembros-del-proyecto-)_
-- GET `/projects/<id>/subtasks/` - _[Obtener todas las subtareas del proyecto](#get-projectsidsubtasks---obtener-todas-las-subtareas-del-proyecto)_
 - PUT `/projects/<id>/` - _[Actualizar proyecto ☆](#put-projectsid---actualizar-proyecto-)_
 - DELETE `/projects/<id>/` - _[Eliminar proyecto ☆](#delete-projectsid---eliminar-proyecto-)_
 
@@ -41,7 +41,6 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
 
 - POST `/tasks/` - _[Crear tarea ☆](#post-tasks---crear-tarea-)_
 - GET `/tasks/<id>/` - _[Obtener tarea](#get-tasksid---obtener-tarea)_
-- GET `/tasks/<id>/subtasks/` - _[Obtener todas las subtareas de la tarea](#get-tasksidsubtasks---obtener-todas-las-subtareas-de-la-tarea)_
 - PUT `/tasks/<id>/` - _[Actualizar tarea ☆](#put-tasksid---actualizar-tarea-)_
 - PUT `/tasks/<id>/status/` - _[Cambiar estado de tarea ☆](#put-tasksidstatus---cambiar-estado-de-tarea-)_
 - DELETE `/tasks/<id>/` - _[Eliminar tarea ☆](#delete-tasksid---eliminar-tarea-)_
@@ -161,6 +160,41 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
 
 ---
 
+#### GET `/me/calendar/` - _Obtener calendario global del usuario ☆_
+
+**Salida**
+
+Nota: las fechas son arreglos de dos números, que representan la posición de la tarea (o tareas) en la matriz del calendario.
+
+```json
+{
+  "tasks": [
+    {
+      "date": [
+        0,
+        1
+      ],
+      "tasks": [
+        {
+          "id": "f8ed4488-0fbc-44b4-9b96-c626caf6a44a",
+          "name": "Junta inicial 123",
+          "status": 2,
+          "priority": 0
+        },
+        ...
+      ]
+    },
+    ...
+  ],
+  "today": [
+    1,
+    5
+  ]
+}
+```
+
+---
+
 ### Projects
 
 #### POST `/projects/` - _Crear proyecto ☆_
@@ -177,7 +211,20 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
 
 #### GET `/projects/<id>/` - _Obtener proyecto_
 
+**Query params**
+
+- `get` - _Para obtener respuestas parciales de solo la información del proyecto o solo las tareas del mismo (sí ahorra mucho tiempo)._
+  - _Opciones: `info`, `tasks`, `all`, default es `all`_
+- `view` - _Cambia el formato de la respuesta para facilitar el front._
+  - _Opciones: `table`, `kanban`, `calendar`, default es `table`_
+- `assigned` - _Mostrar solo tareas asignadas al usuario. Si la request no tiene autenticación, este parámetro se ignora._
+  - _Opciones: `true`, `false`, default es `false`_
+- `subtree` - _Mostrar todo el subárbol de tareas debajo del proyecto actual._
+  - _Opciones: `true`, `false`, default es `false`_
+
 **Salida**
+
+Parámetros default:
 
 ```json
 {
@@ -219,6 +266,68 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
 }
 ```
 
+Ejemplo con get=`tasks`&view=`calendar`:
+
+Nota: las fechas son arreglos de dos números, que representan la posición de la tarea (o tareas) en la matriz del calendario.
+
+```json
+{
+  "tasks": [
+    {
+      "date": [
+        0,
+        3
+      ],
+      "tasks": [
+        {
+          "id": "9bcfd443-9ff2-42cd-b69e-75aa032891e1",
+          "name": "Diseño del chasis",
+          "status": 0,
+          "priority": 0
+        },
+        ...
+      ]
+    },
+    ...
+  ],
+  "today": [
+    1,
+    5
+  ]
+}
+```
+
+Ejemplo con get=`tasks`&view=`kanban`:
+
+```json
+{
+  "tasks": {
+    "notStarted": [
+      {
+        "id": "95a7529b-e750-4c2a-867c-cdb9b167ae34",
+        "name": "Investigación de nuevos materiales para la construcción del chasis",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidid.",
+        "priority": 1,
+        "assignee": {
+          "id": "f8c2280f-3840-490f-b85a-0779badd8f66",
+          "name": "George Russell"
+        }
+      },
+      ...
+    ],
+    "inProgress": [
+      ...
+    ],
+    "inReview": [
+      ...
+    ],
+    "done": [
+      ...
+    ]
+  }
+}
+```
+
 ---
 
 #### GET `/projects/<id>/members/` - _Obtener miembros del proyecto ☆_
@@ -236,32 +345,6 @@ Para crear o actualizar un recurso, el usuario debe ser líder del proyecto pap�
   ...
 ]
 ```
-
----
-
-#### GET `/projects/<id>/subtasks/` - _Obtener todas las subtareas del proyecto_
-
-**Salida**
-
-```json
-[
-  {
-    "id": "0191827d-1e38-4647-885c-aef73ea494b0",
-    "name": "Peso y distribución",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidid.",
-    "status": 3,
-    "priority": 0,
-    "startDate": "2024-02-13",
-    "dueDate": "2024-02-21",
-    "assignee": "Alexander Albon",
-    "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
-    "parentTask": null
-  },
-  ...
-]
-```
-
-TODO: Falta implementar.
 
 ---
 
@@ -300,7 +383,20 @@ TODO: Falta implementar.
 
 #### GET `/tasks/<id>/` - _Obtener tarea_
 
+**Query params**
+
+- `get` - _Para obtener respuestas parciales de solo la información de la tarea o solo las subtareas de la misma (sí ahorra mucho tiempo)._
+  - _Opciones: `info`, `tasks`, `all`, default es `all`_
+- `view` - _Cambia el formato de la respuesta para facilitar el front._
+  - _Opciones: `table`, `kanban`, `calendar`, default es `table`_
+- `assigned` - _Mostrar solo tareas asignadas al usuario. Si la request no tiene autenticación, este parámetro se ignora._
+  - _Opciones: `true`, `false`, default es `false`_
+- `subtree` - _Mostrar todo el subárbol de tareas debajo de la tarea actual._
+  - _Opciones: `true`, `false`, default es `false`_
+
 **Salida**
+
+Ejemplo con parámetros default:
 
 ```json
 {
@@ -338,33 +434,67 @@ TODO: Falta implementar.
 }
 ```
 
----
+Ejemplo con get=`tasks`&view=`calendar`:
 
-#### GET `/tasks/<id>/subtasks/` - _Obtener todas las subtareas de la tarea_
-
-**Salida**
+Nota: las fechas son arreglos de dos números, que representan la posición de la tarea (o tareas) en la matriz del calendario.
 
 ```json
-[
-  {
-    "id": "0191827d-1e38-4647-885c-aef73ea494b0",
-    "name": "Peso y distribución",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidid.",
-    "status": 3,
-    "priority": 0,
-    "startDate": "2024-02-13",
-    "dueDate": "2024-02-21",
-    "assignee": "Alexander Albon",
-    "parentProject": "887ebfdd-bd39-417c-9b42-90396c2b8e59",
-    "parentTask": null
-  },
-  ...
-]
+{
+  "tasks": [
+    {
+      "date": [
+        0,
+        3
+      ],
+      "tasks": [
+        {
+          "id": "9bcfd443-9ff2-42cd-b69e-75aa032891e1",
+          "name": "Diseño del chasis",
+          "status": 0,
+          "priority": 0
+        },
+        ...
+      ]
+    },
+    ...
+  ],
+  "today": [
+    1,
+    5
+  ]
+}
 ```
 
-TODO: Falta implementar.
+Ejemplo con get=`tasks`&view=`kanban`:
 
----
+```json
+{
+  "tasks": {
+    "notStarted": [
+      {
+        "id": "95a7529b-e750-4c2a-867c-cdb9b167ae34",
+        "name": "Investigación de nuevos materiales para la construcción del chasis",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidid.",
+        "priority": 1,
+        "assignee": {
+          "id": "f8c2280f-3840-490f-b85a-0779badd8f66",
+          "name": "George Russell"
+        }
+      },
+      ...
+    ],
+    "inProgress": [
+      ...
+    ],
+    "inReview": [
+      ...
+    ],
+    "done": [
+      ...
+    ]
+  }
+}
+```
 
 #### PUT `/tasks/<id>/` - _Actualizar tarea ☆_
 

@@ -1,4 +1,3 @@
-from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -7,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from devotion.apis import delete_calendar, GoogleAPIException
-from tasks.serializers import SubtaskViewSerializer, calendar_view_type, kanban_view_type
-from users.serializers import UserSerializer, UserMinimalSerializer, UserRoleSerializer
+from users.serializers import UserRoleSerializer
+from tasks.subtasks import handle_subtasks_response
 from .models import Project
 from .serializers import ProjectSerializer, ProjectDeserializer
 
@@ -68,12 +67,10 @@ class ProjectView(APIView):
         except Project.DoesNotExist:
             return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-        view_type = request.query_params.get("view", "table")
-        partial_response = request.query_params.get("partial", "false") == "true"
+        response_fields = request.query_params.get("get", "all")
+        response = {}
 
-        if partial_response:
-            response = {}
-        else:
+        if response_fields in ("info", "all"):
             project_context = {"project": project}
             leaders = set(project.leaders.all())
             members = set(project.members.all()) - leaders
@@ -86,15 +83,8 @@ class ProjectView(APIView):
                 "projects": ProjectSerializer(project.projects.all(), many=True).data
             })
 
-        if view_type == "calendar":
-            calendar_view_type(response, project)
-        elif view_type == "kanban":
-            kanban_view_type(response, project)
-        else:
-            response["tasks"] = SubtaskViewSerializer(
-                project.tasks.filter(parent_task__isnull=True),
-                many=True
-            ).data
+        if response_fields in ("tasks", "all"):
+            handle_subtasks_response(request, response, project)
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -164,25 +154,4 @@ def get_project_members(request: Request, project_id: str) -> Response:
             status=status.HTTP_403_FORBIDDEN)
 
     serializer = UserRoleSerializer(members, many=True, context={"project": project})
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@api_view(["GET"])
-def get_all_subtree_tasks(_request: Request, project_id: str) -> Response:
-    """Obtiene todas las tareas de un proyecto y sus subproyectos."""
-    try:
-        project = Project.objects.get(id=project_id)
-    except Project.DoesNotExist:
-        return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
-
-    all_tasks: QuerySet = project.tasks.all()
-
-    def recurse_project(_project: Project) -> None:
-        nonlocal all_tasks
-        for subproject in _project.projects.all():
-            recurse_project(subproject)
-            all_tasks |= subproject.tasks.all()
-
-    recurse_project(project)
-    serializer = SubtaskViewSerializer(all_tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

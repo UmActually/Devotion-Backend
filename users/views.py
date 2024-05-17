@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from projects.serializers import ProjectSerializer
+from tasks.subtasks import handle_global_calendar_response
 from .models import User
 from .serializers import UserSerializer, UserMinimalSerializer, UserDeserializer
 
@@ -95,3 +96,12 @@ def get_current_user_projects(request: Request) -> Response:
         project["isLeader"] = UUID(project["id"]) in leaded_projects
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_current_user_global_calendar(request: Request) -> Response:
+    """Obtiene el calendario global del usuario autenticado."""
+    response = {}
+    handle_global_calendar_response(request, response)
+    return Response(response, status=status.HTTP_200_OK)
