@@ -8,9 +8,9 @@ from rest_framework.views import APIView
 
 from devotion.apis import delete_event, GoogleAPIException
 from .models import Task, TaskStatus
+from .subtasks import handle_subtasks_response
 from .serializers import (
-    TaskSerializer, TaskViewSerializer, SubtaskViewSerializer,
-    TaskDeserializer, calendar_view_type, kanban_view_type)
+    TaskSerializer, TaskViewSerializer, SubtaskTableSerializer, TaskDeserializer)
 
 
 def bad_request(message: str) -> Response:
@@ -84,21 +84,17 @@ class TaskView(APIView):
         except Task.DoesNotExist:
             return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
-        view_type = request.query_params.get("view", "table")
-        partial_response = request.query_params.get("partial", "false") == "true"
+        response_fields = request.query_params.get("get", "all")
+        response = {}
 
-        if partial_response:
-            response = {}
-        else:
+        if response_fields in ("info", "all"):
             response = TaskViewSerializer(task).data
+
+        if response_fields == "all":
             response["breadcrumbs"] = get_task_breadcrumbs(task)
 
-        if view_type == "calendar":
-            calendar_view_type(response, task)
-        elif view_type == "kanban":
-            kanban_view_type(response, task)
-        else:
-            response["tasks"] = SubtaskViewSerializer(task.tasks.all(), many=True).data
+        if response_fields in ("tasks", "all"):
+            handle_subtasks_response(request, response, task)
 
         return Response(response, status=status.HTTP_200_OK)
 
@@ -237,5 +233,5 @@ def get_all_subtree_tasks(_request: Request, task_id: str) -> Response:
             all_tasks |= _task.tasks.all()
 
     recurse_task(task)
-    serializer = SubtaskViewSerializer(all_tasks, many=True)
+    serializer = SubtaskTableSerializer(all_tasks, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

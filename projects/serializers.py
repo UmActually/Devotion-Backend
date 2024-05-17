@@ -34,7 +34,7 @@ class ProjectDeserializer(serializers.Serializer):
     description = serializers.CharField(max_length=1024, required=False)
     parent = serializers.CharField(required=False)
     leaders = serializers.CharField(required=True)
-    members = serializers.CharField(required=True)
+    members = serializers.CharField(required=True, allow_blank=True)
 
     def validate(self, attrs):
         is_subproject = "parent" in attrs or (
@@ -42,7 +42,7 @@ class ProjectDeserializer(serializers.Serializer):
         self.context["is_subproject"] = is_subproject
 
         leaders = attrs["leaders"].split(",") if "leaders" in attrs else []
-        members = attrs["members"].split(",") if "members" in attrs else []
+        members = attrs["members"].split(",") if "members" in attrs and attrs["members"] else []
 
         if is_subproject:
             parent_id = attrs.get("parent") or self.instance.parent_id
@@ -94,7 +94,8 @@ class ProjectDeserializer(serializers.Serializer):
                 validated_data["leaders"] = set(map(lambda x: str(x.id), old_leaders))
 
             if "members" in validated_data:
-                validated_data["members"] = set(validated_data["members"].split(","))
+                validated_data["members"] = set(validated_data["members"].split(",")) \
+                    if validated_data["members"] else set()
             else:
                 validated_data["members"] = set(map(lambda x: str(x.id), old_members))
 
@@ -108,11 +109,12 @@ class ProjectDeserializer(serializers.Serializer):
 
         instance.save()
 
-        update_calendar(
-            instance,
-            validated_data.keys(),
-            old_leaders=old_leader_emails,
-            old_members=old_member_emails
-        )
+        if not self.context["is_subproject"]:
+            update_calendar(
+                instance,
+                validated_data.keys(),
+                old_leaders=old_leader_emails,
+                old_members=old_member_emails
+            )
 
         return instance
