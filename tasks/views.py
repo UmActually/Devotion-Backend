@@ -119,9 +119,10 @@ class TaskView(APIView):
         task = serializer.save()
 
         if "status" in data and data["status"] == TaskStatus.DONE:
-            task.parent_project.progress *= len(task.parent_project.tasks)
+            task_count = task.parent_project.tasks.count()
+            task.parent_project.progress *= task_count
             task.parent_project.progress += 1
-            task.parent_project.progress /= len(task.parent_project.tasks)
+            task.parent_project.progress /= task_count
             task.parent_project.save()
 
         serializer = TaskSerializer(task)
