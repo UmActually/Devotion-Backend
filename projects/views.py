@@ -9,7 +9,7 @@ from devotion.apis import delete_calendar, GoogleAPIException
 from users.serializers import UserRoleSerializer
 from tasks.subtasks import handle_subtasks_response
 from .models import Project
-from .serializers import ProjectSerializer, ProjectDeserializer, ProjectUpdateDeserializer
+from .serializers import ProjectSerializer, SubprojectSerializer, ProjectDeserializer, ProjectUpdateDeserializer
 
 
 @api_view(["POST"])
@@ -80,7 +80,7 @@ class ProjectView(APIView):
                 "progress": project.progress,
                 "leaders": UserRoleSerializer(leaders, many=True, context=project_context).data,
                 "members": UserRoleSerializer(members, many=True, context=project_context).data,
-                "projects": ProjectSerializer(project.projects.all(), many=True).data
+                "projects": SubprojectSerializer(project.projects.all(), many=True).data
             })
 
         if response_fields in ("tasks", "all"):
