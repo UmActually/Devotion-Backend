@@ -9,7 +9,7 @@ from devotion.apis import delete_calendar, GoogleAPIException
 from users.serializers import UserRoleSerializer
 from tasks.subtasks import handle_subtasks_response
 from .models import Project
-from .serializers import ProjectSerializer, ProjectDeserializer
+from .serializers import ProjectSerializer, ProjectDeserializer, ProjectUpdateDeserializer
 
 
 @api_view(["POST"])
@@ -101,7 +101,7 @@ class ProjectView(APIView):
                 {"message": "No eres líder de este proyecto."},
                 status=status.HTTP_403_FORBIDDEN)
 
-        serializer = ProjectDeserializer(project, data=request.data, partial=True)
+        serializer = ProjectUpdateDeserializer(project, data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -134,24 +134,3 @@ class ProjectView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def get_project_members(request: Request, project_id: str) -> Response:
-    """Obtiene todos los usuarios de un proyecto."""
-    try:
-        project = Project.objects.get(id=project_id)
-    except Project.DoesNotExist:
-        return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
-
-    user = request.user
-    members = project.members.all()
-
-    if not user.is_superuser and user not in members:
-        return Response(
-            {"message": "No eres miembro de este proyecto."},
-            status=status.HTTP_403_FORBIDDEN)
-
-    serializer = UserRoleSerializer(members, many=True, context={"project": project})
-    return Response(serializer.data, status=status.HTTP_200_OK)
