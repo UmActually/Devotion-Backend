@@ -29,13 +29,13 @@ urlpatterns = [
     path("login/refresh/", TokenRefreshView.as_view()),
     path("test/", users.test),
     path("users/", users.UsersView.as_view()),
+    path("users/pool/", users.get_user_search_select_pool),
     path("me/", users.CurrentUserView.as_view()),
     path("me/projects/", users.get_current_user_projects),
     path("me/calendar/", users.get_current_user_global_calendar),
 
     path("projects/", projects.create_project),
     path("projects/<uuid:project_id>/", projects.ProjectView.as_view()),
-    path("projects/<uuid:project_id>/members/", projects.get_project_members),
 
     path("tasks/", tasks.create_task),
     path("tasks/<uuid:task_id>/", tasks.TaskView.as_view()),

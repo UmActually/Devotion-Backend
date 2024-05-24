@@ -112,6 +112,9 @@ def _update_calendar_acl(project: "Project", **kwargs: set[str]) -> None:
     added_members = new_members - old_members
     removed_members = old_members - new_members
 
+    if not promoted_demoted and not added_members and not removed_members:
+        return
+
     calendar_id = project.calendar_id
     batch = google_api.new_batch_http_request(callback=acl_callback)
 
@@ -159,8 +162,7 @@ def _update_calendar_acl(project: "Project", **kwargs: set[str]) -> None:
 def update_calendar(project: "Project", modified_data: Iterable[str], **kwargs: set[str]) -> None:
     if "name" in modified_data or "description" in modified_data:
         _update_calendar_info(project, modified_data)
-    if "leaders" in modified_data or "members" in modified_data:
-        _update_calendar_acl(project, **kwargs)
+    _update_calendar_acl(project, **kwargs)
 
 
 def delete_calendar(calendar_id: str) -> None:

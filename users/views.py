@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
+from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.subtasks import handle_global_calendar_response
 from .models import User
@@ -95,6 +96,29 @@ def get_current_user_projects(request: Request) -> Response:
     for project in serializer.data:
         project["isLeader"] = UUID(project["id"]) in leaded_projects
 
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_user_search_select_pool(request: Request) -> Response:
+    """Obtiene los usuarios disponibles para ser seleccionados en un campo de búsqueda."""
+    project_id = request.query_params.get("project", "none")
+    project = None
+
+    if project_id != "none":
+        try:
+            project = Project.objects.get(id=project_id).parent
+        except Project.DoesNotExist:
+            return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not project:
+        users = User.objects.filter(is_superuser=False)
+        serializer = UserMinimalSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    members = project.members.all()
+    serializer = UserMinimalSerializer(members, many=True, context={"project": project})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
