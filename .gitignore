@@ -2,3 +2,4 @@
 !**/.gitignore
 **/__*
 !**/__init__.py
+db.sqlite3

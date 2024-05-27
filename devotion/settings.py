@@ -11,19 +11,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from datetime import timedelta
-import oracledb
-
-
-# Cositas de config extras
-ORACLE_LIB_DIR = "/app/vendor/oracle/instantclient_19_22"
-TEST_DATABASE = False
-ORACLE_THICK_MODE = False
-DEFAULT_LIB_DIR = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+POSTGRES_DB = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,21 +131,33 @@ WSGI_APPLICATION = 'devotion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': "django.db.backends.oracle",
-        'NAME': env_variable("DB_NAME"),
-        "USER": env_variable("DB_USER"),
-        "PASSWORD": env_variable("DB_PASSWORD")
-    } if not TEST_DATABASE else {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": env_variable("TEST_DB_HOST"),
-        "PORT": "5432",
-        "NAME": env_variable("TEST_DB_NAME"),
-        "USER": env_variable("TEST_DB_USER"),
-        "PASSWORD": env_variable("TEST_DB_PASSWORD")
+if "test" in sys.argv or "test_coverage" in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3'
+        }
     }
-}
+elif POSTGRES_DB:
+    DATABASES = {
+        'default': {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": env_variable("TEST_DB_HOST"),
+            "PORT": "5432",
+            "NAME": env_variable("TEST_DB_NAME"),
+            "USER": env_variable("TEST_DB_USER"),
+            "PASSWORD": env_variable("TEST_DB_PASSWORD")
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': "django.db.backends.oracle",
+            'NAME': env_variable("DB_NAME"),
+            "USER": env_variable("DB_USER"),
+            "PASSWORD": env_variable("DB_PASSWORD")
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -211,12 +217,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = "users.User"
-
-if ORACLE_THICK_MODE:
-    if DEFAULT_LIB_DIR:
-        oracle_lib_dir = None
-    elif not os.path.exists(ORACLE_LIB_DIR):
-        oracle_lib_dir = None
-    else:
-        oracle_lib_dir = ORACLE_LIB_DIR
-    oracledb.init_oracle_client(lib_dir=oracle_lib_dir)

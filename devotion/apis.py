@@ -1,3 +1,4 @@
+import sys
 import json
 from typing import TYPE_CHECKING, Iterable
 from rest_framework import serializers
@@ -40,6 +41,9 @@ def get_calendar_id(task: "Task") -> str:
 
 
 def create_calendar(project: "Project") -> None:
+    if "test" in sys.argv or "test_coverage" in sys.argv:
+        return
+
     try:
         calendar_id = google_api.calendars().insert(body={
             "summary": project.name,
@@ -160,16 +164,25 @@ def _update_calendar_acl(project: "Project", **kwargs: set[str]) -> None:
 
 
 def update_calendar(project: "Project", modified_data: Iterable[str], **kwargs: set[str]) -> None:
+    if "test" in sys.argv or "test_coverage" in sys.argv:
+        return
+
     if "name" in modified_data or "description" in modified_data:
         _update_calendar_info(project, modified_data)
     _update_calendar_acl(project, **kwargs)
 
 
 def delete_calendar(calendar_id: str) -> None:
+    if "test" in sys.argv or "test_coverage" in sys.argv:
+        return
+
     google_api.calendars().delete(calendarId=calendar_id).execute()
 
 
 def create_event(task: "Task") -> None:
+    if "test" in sys.argv or "test_coverage" in sys.argv:
+        return
+
     try:
         event_id = google_api.events().insert(
             calendarId=get_calendar_id(task),
@@ -190,6 +203,9 @@ def create_event(task: "Task") -> None:
 
 
 def update_event(task: "Task", modified_data: Iterable[str]) -> None:
+    if "test" in sys.argv or "test_coverage" in sys.argv:
+        return
+
     body = {}
     if "name" in modified_data:
         body["summary"] = task.name
@@ -212,6 +228,9 @@ def update_event(task: "Task", modified_data: Iterable[str]) -> None:
 
 
 def delete_event(task: "Task") -> None:
+    if "test" in sys.argv or "test_coverage" in sys.argv:
+        return
+
     google_api.events().delete(
         calendarId=get_calendar_id(task),
         eventId=task.event_id
