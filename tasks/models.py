@@ -2,25 +2,23 @@ import uuid
 from django.db import models
 
 
-class TaskStatus(models.IntegerChoices):
-    NOT_STARTED = 0, "Not started"
-    IN_PROGRESS = 1, "In progress"
-    IN_REVIEW = 2, "In review"
-    DONE = 3, "Done"
-
-
-class TaskPriority(models.IntegerChoices):
-    LOW = 0, "Low"
-    MEDIUM = 1, "Medium"
-    HIGH = 2, "High"
-
-
 class Task(models.Model):
+    class Status(models.IntegerChoices):
+        NOT_STARTED = 0, "Not started"
+        IN_PROGRESS = 1, "In progress"
+        IN_REVIEW = 2, "In review"
+        DONE = 3, "Done"
+
+    class Priority(models.IntegerChoices):
+        LOW = 0, "Low"
+        MEDIUM = 1, "Medium"
+        HIGH = 2, "High"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128, null=False, blank=False)
     description = models.TextField(max_length=1024, null=True, blank=True)
-    status = models.SmallIntegerField(choices=TaskStatus.choices, null=False, blank=False)
-    priority = models.SmallIntegerField(choices=TaskPriority.choices, null=False, blank=False)
+    status = models.SmallIntegerField(choices=Status.choices, null=False, blank=False)
+    priority = models.SmallIntegerField(choices=Priority.choices, null=False, blank=False)
     start_date = models.DateField(null=False, blank=False)
     due_date = models.DateField(null=False, blank=False)
     parent_project = models.ForeignKey(

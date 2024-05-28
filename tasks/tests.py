@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from users.models import User
 from projects.models import Project
-from .models import Task, TaskStatus, TaskPriority
+from .models import Task
 
 
 class TasksTestCase(TestCase):
@@ -34,8 +34,8 @@ class TasksTestCase(TestCase):
             due_date="2024-01-01",
             parent_project=self.fsae,
             assignee=self.checo,
-            status=TaskStatus.NOT_STARTED,
-            priority=TaskPriority.MEDIUM,
+            status=Task.Status.NOT_STARTED,
+            priority=Task.Priority.MEDIUM,
         )
 
     def test_user_story_15(self):

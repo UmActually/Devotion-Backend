@@ -2,7 +2,7 @@ import time
 import uuid
 from django.db import models
 from devotion.apis import google_api
-from tasks.models import TaskStatus
+from tasks.models import Task
 
 
 class Project(models.Model):
@@ -38,7 +38,7 @@ def migrate_projects_progress() -> None:
         if len(tasks) == 0:
             project.progress = 0
         else:
-            done_tasks = len([t for t in tasks if t.status == TaskStatus.DONE])
+            done_tasks = len([t for t in tasks if t.status == Task.Status.DONE])
             project.progress = (done_tasks / len(tasks)) * 100
         project.save()
         print(project.name, "-", project.progress)

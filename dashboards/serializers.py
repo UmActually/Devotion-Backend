@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from devotion.serializers import CCModelSerializer
-from .models import Widget, WidgetDisplayType, DataSource
+from .models import Widget, DataSource
 from tasks.serializers import get_project_or_error
 
 
@@ -29,7 +29,7 @@ class WidgetDeserializer(serializers.Serializer):
 
     def validate(self, attrs):
         display_type = attrs["display_type"]
-        if display_type not in WidgetDisplayType.values:
+        if display_type not in Widget.DisplayType.values:
             raise serializers.ValidationError("Tipo de visualización inválido.")
 
         self.context["project"] = get_project_or_error(attrs["project"])

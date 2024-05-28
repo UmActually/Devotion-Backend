@@ -5,7 +5,7 @@ from devotion.apis import create_event, update_event
 from devotion.serializers import CCModelSerializer
 from projects.models import Project
 from users.serializers import UserMinimalSerializer
-from .models import Task, TaskStatus, TaskPriority
+from .models import Task
 
 
 def get_project_or_error(project_id: str) -> Project:
@@ -103,7 +103,7 @@ class TaskDeserializer(serializers.Serializer):
         assignee_id = attrs.get("assignee") or str(self.instance.assignee_id)
         check_project_membership(assignee_id, parent_project)
 
-        if "priority" in attrs and attrs["priority"] not in TaskPriority.values:
+        if "priority" in attrs and attrs["priority"] not in Task.Priority.values:
             raise serializers.ValidationError("Valor de prioridad inválido.")
 
         try:
@@ -120,7 +120,7 @@ class TaskDeserializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.setdefault("priority", TaskPriority.MEDIUM)
+        validated_data.setdefault("priority", Task.Priority.MEDIUM)
         validated_data.setdefault("start_date", min(datetime.date.today(), validated_data["due_date"]))
         parent_project = self.context["parent_project"]
         task_count = self.context["parent_project_task_count"]
@@ -128,7 +128,7 @@ class TaskDeserializer(serializers.Serializer):
         task = Task.objects.create(
             name=validated_data["name"],
             description=validated_data.get("description"),
-            status=TaskStatus.NOT_STARTED,
+            status=Task.Status.NOT_STARTED,
             priority=validated_data["priority"],
             start_date=validated_data.get("start_date"),
             due_date=validated_data["due_date"],

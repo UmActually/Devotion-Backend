@@ -18,20 +18,19 @@ class DataSource(models.Model):
         return self.mqtt_topic
 
 
-class WidgetDisplayType(models.IntegerChoices):
-    NUMBER = 0, "Number"
-    BAR_CHART = 1, "Bar chart"
-    LINE_CHART = 2, "Line chart"
-    PIE_CHART = 3, "Pie chart"
-    GAUGE = 4, "Gauge"
-    TABLE = 5, "Table"
-
-
 class Widget(models.Model):
+    class DisplayType(models.IntegerChoices):
+        NUMBER = 0, "Number"
+        BAR_CHART = 1, "Bar chart"
+        LINE_CHART = 2, "Line chart"
+        PIE_CHART = 3, "Pie chart"
+        GAUGE = 4, "Gauge"
+        TABLE = 5, "Table"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64, null=False, blank=False)
     display_type = models.SmallIntegerField(
-        choices=WidgetDisplayType.choices, null=False, blank=False
+        choices=DisplayType.choices, null=False, blank=False
     )
     data_source = models.ForeignKey(
         "DataSource", on_delete=models.CASCADE, null=False, blank=False

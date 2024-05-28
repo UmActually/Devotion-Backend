@@ -6,7 +6,7 @@ from django.db.models import QuerySet
 from rest_framework.request import Request
 
 from projects.models import Project
-from .models import Task, TaskStatus
+from .models import Task
 from .serializers import SubtaskTableSerializer, SubtaskCalendarSerializer, SubtaskKanbanSerializer
 
 
@@ -51,12 +51,12 @@ def calendar_view_type(response: JSONObject, tasks: QuerySet) -> None:
 
 
 def kanban_view_type(response: JSONObject, tasks: QuerySet) -> None:
-    tasks = tasks.order_by("status", "-priority")
+    tasks = tasks.order_by("status", "-prio,rity")
     tasks = {
-        "notStarted": tasks.filter(status=TaskStatus.NOT_STARTED),
-        "inProgress": tasks.filter(status=TaskStatus.IN_PROGRESS),
-        "inReview": tasks.filter(status=TaskStatus.IN_REVIEW),
-        "done": tasks.filter(status=TaskStatus.DONE)
+        "notStarted": tasks.filter(status=Task.Status.NOT_STARTED),
+        "inProgress": tasks.filter(status=Task.Status.IN_PROGRESS),
+        "inReview": tasks.filter(status=Task.Status.IN_REVIEW),
+        "done": tasks.filter(status=Task.Status.DONE)
     }
     response["tasks"] = {
         key: SubtaskKanbanSerializer(value, many=True).data

@@ -25,7 +25,7 @@ def acentoless(text: str) -> str:
 def email_from_name(first: str, last: str, attempt: int = 1) -> str:
     first = acentoless(first).split(" ")[0]
     last = acentoless(last).split(" ")[0]
-    return f"{first}{last}{'' if attempt == 1 else attempt}@example.com"
+    return f"{first}{last}{'' if attempt == 1 else attempt}@salad.com"
 
 
 def login(email: str, password: str) -> str:

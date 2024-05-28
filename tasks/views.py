@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from devotion.apis import delete_event, GoogleAPIException
-from .models import Task, TaskStatus
+from .models import Task
 from .subtasks import handle_subtasks_response
 from .serializers import (
     TaskSerializer, TaskViewSerializer, SubtaskTableSerializer, TaskDeserializer)
@@ -118,7 +118,7 @@ class TaskView(APIView):
 
         task = serializer.save()
 
-        if "status" in data and data["status"] == TaskStatus.DONE:
+        if "status" in data and data["status"] == Task.Status.DONE:
             task_count = task.parent_project.tasks.count()
             task.parent_project.progress *= task_count
             task.parent_project.progress += 1
@@ -149,7 +149,7 @@ class TaskView(APIView):
             parent_project.progress = 0
         else:
             parent_project.progress *= task_count + 1
-            if task.status == TaskStatus.DONE:
+            if task.status == Task.Status.DONE:
                 parent_project.progress -= 100
             parent_project.progress /= task_count
         parent_project.save()
@@ -174,7 +174,7 @@ def update_task_status(request: Request, task_id: str) -> Response:
         new_status = int(request.data["status"])
     except ValueError:
         return bad_request("Valor de status inválido.")
-    if new_status not in TaskStatus.values:
+    if new_status not in Task.Status.values:
         return bad_request("Valor de status inválido.")
 
     try:
@@ -194,7 +194,7 @@ def update_task_status(request: Request, task_id: str) -> Response:
     if old_status == new_status:
         return Response({"message": "Task is already in this status"}, status=status.HTTP_204_NO_CONTENT)
 
-    if not is_leader and (old_status == TaskStatus.DONE or new_status == TaskStatus.DONE):
+    if not is_leader and (old_status == Task.Status.DONE or new_status == Task.Status.DONE):
         return Response(
             {"message": "Solo los líderes pueden marcar tareas como completadas, o desmarcarlas."},
             status=status.HTTP_403_FORBIDDEN)
@@ -203,11 +203,11 @@ def update_task_status(request: Request, task_id: str) -> Response:
     task.save()
 
     task_count = parent_project.tasks.count()
-    if old_status == TaskStatus.DONE:
+    if old_status == Task.Status.DONE:
         parent_project.progress *= task_count
         parent_project.progress -= 100
         parent_project.progress /= task_count
-    if new_status == TaskStatus.DONE:
+    if new_status == Task.Status.DONE:
         parent_project.progress *= task_count
         parent_project.progress += 100
         parent_project.progress /= task_count

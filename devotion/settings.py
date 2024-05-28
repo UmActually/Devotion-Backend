@@ -15,9 +15,6 @@ import sys
 from pathlib import Path
 from datetime import timedelta
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-POSTGRES_DB = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +36,8 @@ def env_variable(name: str) -> str:
         return read_env_file(name)
 
 
+DEBUG = env_variable("DEBUG") == "true"
+USE_POSTGRES = env_variable("USE_POSTGRES") == "true"
 SECRET_KEY = env_variable("SECRET_KEY")
 
 ALLOWED_HOSTS = [
@@ -138,15 +137,15 @@ if "test" in sys.argv or "test_coverage" in sys.argv:
             'NAME': BASE_DIR / 'db.sqlite3'
         }
     }
-elif POSTGRES_DB:
+elif USE_POSTGRES:
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.postgresql",
-            "HOST": env_variable("TEST_DB_HOST"),
+            "HOST": env_variable("POSTGRES_HOST"),
             "PORT": "5432",
-            "NAME": env_variable("TEST_DB_NAME"),
-            "USER": env_variable("TEST_DB_USER"),
-            "PASSWORD": env_variable("TEST_DB_PASSWORD")
+            "NAME": env_variable("POSTGRES_NAME"),
+            "USER": env_variable("POSTGRES_USER"),
+            "PASSWORD": env_variable("POSTGRES_PASSWORD")
         }
     }
 else:
