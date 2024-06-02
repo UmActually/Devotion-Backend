@@ -21,6 +21,7 @@ import users.views as users
 import projects.views as projects
 import tasks.views as tasks
 import dashboards.views as dashboards
+import invites.views as invites
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -49,4 +50,7 @@ urlpatterns = [
     path("data_sources/", dashboards.create_data_source),
     path("data_sources/<uuid:data_source_id>/", dashboards.DataSourceView.as_view()),
     path("all_data_sources/", dashboards.get_all_data_sources),
+
+    path("invites/", invites.create_invite),
+    path("invites/<uuid:invite_id>/", invites.get_invite),
 ]
