@@ -23,8 +23,8 @@ def create_invite(request: Request) -> Response:
     Crea una invitación.
 
     Campos:
-    - email
     - project
+    - task
     """
     data = request.data
     has_project = "project" in data
@@ -47,15 +47,15 @@ def create_invite(request: Request) -> Response:
             return bad_request("Tarea no encontrada.")
         project = task.parent_project
 
-    if request.user not in project.leaders.all():
+    if not request.user.is_superuser and request.user not in project.leaders.all():
         return Response(
             {"message": "No eres líder del proyecto."},
             status=status.HTTP_403_FORBIDDEN)
 
     now = datetime.datetime.now(pytz.timezone("Mexico/General"))
     invite = Invite.objects.create(
-        project_id=project if has_project else None,
-        task_id=task if has_task else None,
+        project_id=project.id if has_project else None,
+        task_id=task.id if has_task else None,
         expiration_date=now + datetime.timedelta(days=7),
     )
 

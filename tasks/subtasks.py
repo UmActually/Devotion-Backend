@@ -51,7 +51,7 @@ def calendar_view_type(response: JSONObject, tasks: QuerySet) -> None:
 
 
 def kanban_view_type(response: JSONObject, tasks: QuerySet) -> None:
-    tasks = tasks.order_by("status", "-prio,rity")
+    tasks = tasks.order_by("status", "-priority")
     tasks = {
         "notStarted": tasks.filter(status=Task.Status.NOT_STARTED),
         "inProgress": tasks.filter(status=Task.Status.IN_PROGRESS),
