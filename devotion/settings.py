@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "projects",
     "tasks",
     "dashboards",
+    "invites",
     "corsheaders"
 ]
 
