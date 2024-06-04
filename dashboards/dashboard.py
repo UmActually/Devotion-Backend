@@ -96,3 +96,62 @@ class Dashboard:
                 {"date": key, "count": len(value) / max_count}
                 for key, value in grouped_tasks.items()
             ]
+
+    @metric
+    def tasks_by_status(self, widget_type: WidgetType) -> JSONObject:
+        not_started_tasks = self.project_tasks.filter(
+            parent_task=None,
+            status=Task.Status.NOT_STARTED
+        ).count()
+        
+        in_progress_tasks = self.project_tasks.filter(
+            parent_task=None,
+            status=Task.Status.IN_PROGRESS
+        ).count()
+        
+        in_review_tasks = self.project_tasks.filter(
+            parent_task=None,
+            status=Task.Status.IN_REVIEW
+        ).count()
+        
+        done_tasks = self.project_tasks.filter(
+            parent_task=None,
+            status=Task.Status.DONE
+        ).count()
+        
+        grouped_tasks = [
+            (Task.Status.NOT_STARTED, not_started_tasks),
+            (Task.Status.IN_PROGRESS, in_progress_tasks),
+            (Task.Status.IN_REVIEW, in_review_tasks),
+            (Task.Status.DONE, done_tasks)
+        ]
+        
+        status_translation = {
+            "NOT_STARTED": "No iniciado",
+            "IN_PROGRESS": "En progreso",
+            "IN_REVIEW": "En revisión",
+            "DONE": "Completado"
+        }
+
+        if widget_type == WidgetType.VERTICAL_BAR:
+            return [
+                {"name": status_translation[key.name], "value": value}
+                for key, value in grouped_tasks
+            ]
+        elif widget_type == WidgetType.HORIZONTAL_BAR:
+            return [
+                {"name": key, "value": value}
+                for key, value in grouped_tasks
+            ]
+        elif widget_type == WidgetType.PIE:
+            return [
+                {"name": key, "value": value}
+                for key, value in grouped_tasks
+            ]
+        else:
+            # Heatmap
+            max_count = max(value for _, value in grouped_tasks)
+            return [
+                {"name": key, "value": value / max_count}
+                for key, value in grouped_tasks
+            ]
