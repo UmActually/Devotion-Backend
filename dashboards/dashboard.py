@@ -68,6 +68,33 @@ class Dashboard:
             status=Task.Status.DONE
         )
         return done_tasks.count()
+    
+    @metric
+    def tasks_by_priority(self, widget_type: WidgetType) -> JSONObject:
+        tasks = self.project_tasks.filter(
+            parent_task=None
+        ).order_by("priority")
+
+        grouped_tasks = {}
+
+        for task in tasks:
+            priority = task.priority
+            if priority not in grouped_tasks:
+                grouped_tasks[priority] = []
+            grouped_tasks[priority].append(task)
+
+        if widget_type in (WidgetType.VERTICAL_BAR, WidgetType.HORIZONTAL_BAR):
+            return [
+                {"priority": key, "count": len(value)}
+                for key, value in grouped_tasks.items()
+            ]
+        else:
+            # Pie or Heatmap
+            max_count = max(len(value) for value in grouped_tasks.values())
+            return [
+                {"priority": key, "count": len(value) / max_count}
+                for key, value in grouped_tasks.items()
+            ]
 
     @metric
     def done_tasks_by_date(self, widget_type: WidgetType) -> JSONObject:
