@@ -54,4 +54,9 @@ project_metrics: dict[str, ProjectMetric] = {
         "Progreso del proyecto",
         (WidgetType.GAUGE,)
     ),
+
+    "all_project_progress": ProjectMetric(
+        "Progreso del proyecto (total)",
+        (WidgetType.GAUGE,)
+    )
 }
