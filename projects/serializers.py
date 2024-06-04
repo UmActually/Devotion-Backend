@@ -3,7 +3,7 @@ from rest_framework import serializers
 from devotion.apis import create_calendar, update_calendar
 from devotion.serializers import CCModelSerializer
 from users.models import User
-from .models import Project
+from .models import Project, DEFAULT_WIDGET_CONFIG
 
 
 def get_project_or_error(project_id: str) -> Project:
@@ -65,7 +65,7 @@ class ProjectDeserializer(serializers.Serializer):
         project = Project.objects.create(
             name=validated_data["name"],
             description=validated_data.get("description"),
-            widget_config=1877248
+            widget_config=DEFAULT_WIDGET_CONFIG
         )
 
         project.leaders.set(validated_data["leaders"])
