@@ -37,19 +37,11 @@ urlpatterns = [
 
     path("projects/", projects.create_project),
     path("projects/<uuid:project_id>/", projects.ProjectView.as_view()),
+    path("projects/<uuid:project_id>/dashboard/", dashboards.get_project_dashboard),
 
     path("tasks/", tasks.create_task),
     path("tasks/<uuid:task_id>/", tasks.TaskView.as_view()),
     path("tasks/<uuid:task_id>/status/", tasks.update_task_status),
-
-    path("dashboards/<uuid:project_id>/", dashboards.DashboardView.as_view()),
-    path("widgets/", dashboards.create_widget),
-    # path("widgets/<uuid:widget_id>/", dashboards.WidgetView.as_view()),
-    path("all_widgets/", dashboards.get_all_widgets),
-
-    path("data_sources/", dashboards.create_data_source),
-    path("data_sources/<uuid:data_source_id>/", dashboards.DataSourceView.as_view()),
-    path("all_data_sources/", dashboards.get_all_data_sources),
 
     path("invites/", invites.create_invite),
     path("invites/<uuid:invite_id>/", invites.get_invite),

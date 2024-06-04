@@ -65,6 +65,7 @@ class ProjectDeserializer(serializers.Serializer):
         project = Project.objects.create(
             name=validated_data["name"],
             description=validated_data.get("description"),
+            widget_config=1877248
         )
 
         project.leaders.set(validated_data["leaders"])
