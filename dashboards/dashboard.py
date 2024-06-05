@@ -11,7 +11,6 @@ from tasks.models import Task
 from tasks.subtasks import get_all_subtree
 from .metrics import WidgetType, project_metrics
 
-
 JSONObject = dict[str, Any] | list[Any] | int
 MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
@@ -190,22 +189,22 @@ class Dashboard:
     @metric
     def user_workload(self, widget_type: WidgetType) -> JSONObject:
         user_workload = {}
-       # Caso Heat Map
+        # Caso Heat Map
         if widget_type == WidgetType.HEAT_MAP:
             today = datetime.datetime.now(pytz.timezone("Mexico/General")).date()
             this_month_tasks = self.project_tasks.filter(
                 start_date__month=today.month, start_date__year=today.year
-                ).order_by("start_date")
+            ).order_by("start_date")
             for task in this_month_tasks:
-            # Sumar tasks por usuario
+                # Sumar tasks por usuario
                 if task.assignee:
                     assignee_name = str(task.assignee)
                     if assignee_name not in user_workload:
                         user_workload[assignee_name] = 0
                     user_workload[assignee_name] += 1
 
-
             return [{"name": key, "value": value} for key, value in user_workload.items()]
+
         # Caso Vertical Bar o Horizontal Bar
         else:
             for task in self.project_tasks:
@@ -215,7 +214,3 @@ class Dashboard:
                         user_workload[assignee_name] = 0
                     user_workload[assignee_name] += 1
             return [{"name": key, "value": value} for key, value in user_workload.items()]
-
-
-
-
