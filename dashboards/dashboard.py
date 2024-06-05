@@ -224,18 +224,24 @@ class Dashboard:
     @metric
     def user_workload(self, widget_type: WidgetType) -> JSONObject:
         user_workload = {}
+
         # Caso Heat Map
         if widget_type == WidgetType.HEAT_MAP:
-                for task in self.tasks_last_weeks:
-                    if str(task.assignee) not in user_workload:
-                        user_workload[str(task.assignee)] = [{"name": label, "value": 0} for label in self.last_weeks_labels]
-                    days_difference = (task.start_date - self.start_date).days
-                    index = days_difference // 7
-                    user_workload[str(task.assignee)][index]["value"] += 1
-                return [
-                    {"name": user, "series": counts}
-                    for user, counts in user_workload.items()
-                ]
+            for task in self.tasks_last_weeks:
+                if str(task.assignee) not in user_workload:
+                    user_workload[str(task.assignee)] = [
+                        {"name": label, "value": 0} for label in self.last_weeks_labels
+                    ]
+
+                days_difference = (task.start_date - self.start_date).days
+                index = days_difference // 7
+                user_workload[str(task.assignee)][index]["value"] += 1
+
+            return [
+                {"name": user, "series": counts}
+                for user, counts in user_workload.items()
+            ]
+
         # Caso Vertical Bar o Horizontal Bar
         else:
             for task in self.project_tasks:
@@ -244,4 +250,5 @@ class Dashboard:
                     if assignee_name not in user_workload:
                         user_workload[assignee_name] = 0
                     user_workload[assignee_name] += 1
+
             return [{"name": key, "value": value} for key, value in user_workload.items()]
