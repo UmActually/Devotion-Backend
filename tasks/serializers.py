@@ -67,6 +67,7 @@ class SubtaskKanbanSerializer(CCModelSerializer):
 
 class TaskDashboardSerializer(CCModelSerializer):
     parent_project = serializers.StringRelatedField()
+
     class Meta:
         model = Task
         fields = ("id", "name", "description", "priority",

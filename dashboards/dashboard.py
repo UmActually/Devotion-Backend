@@ -2,15 +2,18 @@ import datetime
 from typing import Any, Callable
 
 import pytz
+from django.contrib.auth.models import AnonymousUser
 from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.response import Response
 
+from devotion.serializers import camel_case
+from users.models import User
 from projects.models import Project, get_widget_configuration
 from tasks.models import Task
 from tasks.subtasks import get_all_subtree
+from tasks.serializers import TaskDashboardSerializer
 from .metrics import WidgetType, project_metrics
-
 
 JSONObject = dict[str, Any] | list[Any] | int
 MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
@@ -23,23 +26,23 @@ def metric(func: Callable) -> Callable:
 
 
 class Dashboard:
-    USE_TEST_WIDGET_CONFIG = False
+    USE_TEST_WIDGET_CONFIG = True
     TEST_WIDGET_CONFIG = {
         "done_tasks_count": WidgetType.NUMBER,
         "all_done_tasks_count": WidgetType.NUMBER,
         "done_tasks_by_date": WidgetType.LINE,
         "tasks_by_status": WidgetType.VERTICAL_BAR,
         "tasks_by_priority": WidgetType.VERTICAL_BAR,
-        "user_workload": WidgetType.NUMBERS,
+        "user_workload": WidgetType.HEAT_MAP,
         "project_progress": WidgetType.GAUGE,
         "all_project_progress": WidgetType.GAUGE
     }
 
-    def __init__(self, project: Project) -> None:
+    def __init__(self, project: Project, user: User | AnonymousUser) -> None:
         self.project = project
+        self.user = user
         self.project_tasks: QuerySet = project.tasks.filter(parent_task__isnull=True)
         self.project_subtasks: QuerySet = get_all_subtree(project)
-        self.response_dict: JSONObject = {}
 
         self.configuration: dict[str, WidgetType] = self.TEST_WIDGET_CONFIG \
             if self.USE_TEST_WIDGET_CONFIG else get_widget_configuration(project.widget_config)
@@ -61,6 +64,8 @@ class Dashboard:
                 f" - {end_date.day} {MONTHS[end_date.month - 1]}")
 
     def get_response(self) -> Response:
+        data: JSONObject = self.get_task_widgets()
+
         for metric_name in project_metrics:
             try:
                 widget = getattr(self, metric_name)
@@ -69,9 +74,38 @@ class Dashboard:
 
             resp = widget(self.configuration[metric_name])
             if resp is not None:
-                self.response_dict[metric_name] = resp
+                data[camel_case(metric_name)] = resp
 
-        return Response(self.response_dict, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
+
+    # Task widgets
+
+    def get_task_widgets(self) -> JSONObject:
+        if self.user == AnonymousUser():
+            return {}
+
+        is_leader = self.user in self.project.leaders.all()
+        tasks_to_do = self.project_subtasks.filter(
+            assignee_id=self.user.id,
+            status__in=(Task.Status.NOT_STARTED, Task.Status.IN_PROGRESS)
+        )
+
+        if is_leader:
+            tasks_to_verify = self.project_tasks.filter(
+                status=Task.Status.IN_REVIEW
+            )
+        else:
+            tasks_to_verify = self.project_subtasks.filter(
+                assignee_id=self.user.id,
+                status=Task.Status.IN_REVIEW
+            )
+
+        return {
+            "tasksToDo": TaskDashboardSerializer(tasks_to_do, many=True).data,
+            "tasksToVerify": TaskDashboardSerializer(tasks_to_verify, many=True).data
+        }
+
+    # Metric widgets
 
     @metric
     def done_tasks_count(self, widget_type: WidgetType) -> JSONObject:
@@ -86,7 +120,7 @@ class Dashboard:
             status=Task.Status.DONE
         )
         return done_tasks.count()
-    
+
     @metric
     def done_tasks_by_date(self, widget_type: WidgetType) -> JSONObject:
         tasks = self.tasks_last_weeks.filter(
@@ -114,15 +148,15 @@ class Dashboard:
         in_progress_tasks = self.project_tasks.filter(
             status=Task.Status.IN_PROGRESS
         ).count()
-        
+
         in_review_tasks = self.project_tasks.filter(
             status=Task.Status.IN_REVIEW
         ).count()
-        
+
         done_tasks = self.project_tasks.filter(
             status=Task.Status.DONE
         ).count()
-        
+
         labels = (
             "No iniciado",
             "En progreso",
@@ -148,7 +182,7 @@ class Dashboard:
                 {"name": label, "value": count}
                 for label, count in zip(labels, counts)
             ]
-            
+
     @metric
     def tasks_by_priority(self, widget_type: WidgetType) -> JSONObject:
         low_tasks = self.project_tasks.filter(
@@ -186,3 +220,35 @@ class Dashboard:
                 {"name": label, "value": count}
                 for label, count in zip(labels, counts)
             ]
+
+    @metric
+    def user_workload(self, widget_type: WidgetType) -> JSONObject:
+        user_workload = {}
+
+        # Caso Heat Map
+        if widget_type == WidgetType.HEAT_MAP:
+            for task in self.tasks_last_weeks:
+                if str(task.assignee) not in user_workload:
+                    user_workload[str(task.assignee)] = [
+                        {"name": label, "value": 0} for label in self.last_weeks_labels
+                    ]
+
+                days_difference = (task.start_date - self.start_date).days
+                index = days_difference // 7
+                user_workload[str(task.assignee)][index]["value"] += 1
+
+            return [
+                {"name": user, "series": counts}
+                for user, counts in user_workload.items()
+            ]
+
+        # Caso Vertical Bar o Horizontal Bar
+        else:
+            for task in self.project_tasks:
+                if task.assignee:
+                    assignee_name = str(task.assignee)
+                    if assignee_name not in user_workload:
+                        user_workload[assignee_name] = 0
+                    user_workload[assignee_name] += 1
+
+            return [{"name": key, "value": value} for key, value in user_workload.items()]

@@ -25,5 +25,5 @@ def get_project_dashboard(request: Request, project_id: str) -> Response:
         project.widget_config = config_number
         project.save()
 
-    dashboard = Dashboard(project)
+    dashboard = Dashboard(project, request.user)
     return dashboard.get_response()
