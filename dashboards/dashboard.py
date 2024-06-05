@@ -1,3 +1,5 @@
+import datetime
+import pytz
 from typing import Any, Callable
 
 from django.db.models.query import QuerySet
@@ -20,21 +22,21 @@ def metric(func: Callable) -> Callable:
 
 
 class Dashboard:
-    USE_TEST_WIDGET_CONFIG = False
+    USE_TEST_WIDGET_CONFIG = True
     TEST_WIDGET_CONFIG = {
         "done_tasks_count": WidgetType.NUMBER,
         "all_done_tasks_count": WidgetType.NUMBER,
         "done_tasks_by_date": WidgetType.LINE,
         "tasks_by_status": WidgetType.VERTICAL_BAR,
         "tasks_by_priority": WidgetType.VERTICAL_BAR,
-        "user_workload": WidgetType.NUMBERS,
+        "user_workload": WidgetType.HEAT_MAP,
         "project_progress": WidgetType.GAUGE,
         "all_project_progress": WidgetType.GAUGE
     }
 
     def __init__(self, project: Project) -> None:
         self.project = project
-        self.project_tasks: QuerySet = project.tasks
+        self.project_tasks: QuerySet = project.tasks.all()
         self.project_subtasks: QuerySet = get_all_subtree(project)
         self.response_dict: JSONObject = {}
 
@@ -96,3 +98,35 @@ class Dashboard:
                 {"date": key, "count": len(value) / max_count}
                 for key, value in grouped_tasks.items()
             ]
+    @metric
+    def user_workload(self, widget_type: WidgetType) -> JSONObject:
+        user_workload = {}
+       # Caso Heat Map
+        if widget_type == WidgetType.HEAT_MAP:
+            today = datetime.datetime.now(pytz.timezone("Mexico/General")).date()
+            this_month_tasks = self.project_tasks.filter(
+                start_date__month=today.month, start_date__year=today.year
+                ).order_by("start_date")
+            for task in this_month_tasks:
+            # Sumar tasks por usuario
+                if task.assignee:
+                    assignee_name = str(task.assignee)
+                    if assignee_name not in user_workload:
+                        user_workload[assignee_name] = 0
+                    user_workload[assignee_name] += 1
+                
+
+            return [{"name": key, "value": value} for key, value in user_workload.items()]
+        # Caso Vertical Bar o Horizontal Bar
+        else:
+            for task in self.project_tasks:
+                if task.assignee:
+                    assignee_name = str(task.assignee)
+                    if assignee_name not in user_workload:
+                        user_workload[assignee_name] = 0
+                    user_workload[assignee_name] += 1
+            return [{"name": key, "value": value} for key, value in user_workload.items()]
+
+        
+
+        
