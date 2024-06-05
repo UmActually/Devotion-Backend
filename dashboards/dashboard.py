@@ -15,7 +15,6 @@ from tasks.subtasks import get_all_subtree
 from tasks.serializers import TaskDashboardSerializer
 from .metrics import WidgetType, project_metrics
 
-
 JSONObject = dict[str, Any] | list[Any] | int
 MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
@@ -27,14 +26,14 @@ def metric(func: Callable) -> Callable:
 
 
 class Dashboard:
-    USE_TEST_WIDGET_CONFIG = False
+    USE_TEST_WIDGET_CONFIG = True
     TEST_WIDGET_CONFIG = {
         "done_tasks_count": WidgetType.NUMBER,
         "all_done_tasks_count": WidgetType.NUMBER,
         "done_tasks_by_date": WidgetType.LINE,
         "tasks_by_status": WidgetType.VERTICAL_BAR,
         "tasks_by_priority": WidgetType.VERTICAL_BAR,
-        "user_workload": WidgetType.NUMBERS,
+        "user_workload": WidgetType.HEAT_MAP,
         "project_progress": WidgetType.GAUGE,
         "all_project_progress": WidgetType.GAUGE
     }
@@ -121,7 +120,7 @@ class Dashboard:
             status=Task.Status.DONE
         )
         return done_tasks.count()
-    
+
     @metric
     def done_tasks_by_date(self, widget_type: WidgetType) -> JSONObject:
         tasks = self.tasks_last_weeks.filter(
@@ -149,15 +148,15 @@ class Dashboard:
         in_progress_tasks = self.project_tasks.filter(
             status=Task.Status.IN_PROGRESS
         ).count()
-        
+
         in_review_tasks = self.project_tasks.filter(
             status=Task.Status.IN_REVIEW
         ).count()
-        
+
         done_tasks = self.project_tasks.filter(
             status=Task.Status.DONE
         ).count()
-        
+
         labels = (
             "No iniciado",
             "En progreso",
@@ -183,7 +182,7 @@ class Dashboard:
                 {"name": label, "value": count}
                 for label, count in zip(labels, counts)
             ]
-            
+
     @metric
     def tasks_by_priority(self, widget_type: WidgetType) -> JSONObject:
         low_tasks = self.project_tasks.filter(
@@ -221,3 +220,28 @@ class Dashboard:
                 {"name": label, "value": count}
                 for label, count in zip(labels, counts)
             ]
+
+    @metric
+    def user_workload(self, widget_type: WidgetType) -> JSONObject:
+        user_workload = {}
+        # Caso Heat Map
+        if widget_type == WidgetType.HEAT_MAP:
+                for task in self.tasks_last_weeks:
+                    if str(task.assignee) not in user_workload:
+                        user_workload[str(task.assignee)] = [{"name": label, "value": 0} for label in self.last_weeks_labels]
+                    days_difference = (task.start_date - self.start_date).days
+                    index = days_difference // 7
+                    user_workload[str(task.assignee)][index]["value"] += 1
+                return [
+                    {"name": user, "series": counts}
+                    for user, counts in user_workload.items()
+                ]
+        # Caso Vertical Bar o Horizontal Bar
+        else:
+            for task in self.project_tasks:
+                if task.assignee:
+                    assignee_name = str(task.assignee)
+                    if assignee_name not in user_workload:
+                        user_workload[assignee_name] = 0
+                    user_workload[assignee_name] += 1
+            return [{"name": key, "value": value} for key, value in user_workload.items()]
