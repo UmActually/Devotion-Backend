@@ -1,7 +1,7 @@
 import datetime
-import pytz
 from typing import Any, Callable
 
+import pytz
 from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.response import Response
@@ -13,6 +13,7 @@ from .metrics import WidgetType, project_metrics
 
 
 JSONObject = dict[str, Any] | list[Any] | int
+MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
 
 def metric(func: Callable) -> Callable:
@@ -36,12 +37,28 @@ class Dashboard:
 
     def __init__(self, project: Project) -> None:
         self.project = project
-        self.project_tasks: QuerySet = project.tasks.all()
+        self.project_tasks: QuerySet = project.tasks.filter(parent_task__isnull=True)
         self.project_subtasks: QuerySet = get_all_subtree(project)
         self.response_dict: JSONObject = {}
 
         self.configuration: dict[str, WidgetType] = self.TEST_WIDGET_CONFIG \
             if self.USE_TEST_WIDGET_CONFIG else get_widget_configuration(project.widget_config)
+
+        self.today = datetime.datetime.now(pytz.timezone("Mexico/General")).date()
+        self.end_date = self.today - datetime.timedelta(days=self.today.weekday() + 1)
+        self.start_date = self.end_date - datetime.timedelta(days=35)
+        self.tasks_last_weeks = self.project_tasks.filter(
+            start_date__gte=self.start_date,
+            start_date__lt=self.end_date
+        ).order_by("due_date")
+
+        self.last_weeks_labels = []
+        for i in range(5):
+            start_date = self.start_date + datetime.timedelta(days=i * 7)
+            end_date = start_date + datetime.timedelta(days=6)
+            self.last_weeks_labels.append(
+                f"{start_date.day} {MONTHS[start_date.month - 1]}"
+                f" - {end_date.day} {MONTHS[end_date.month - 1]}")
 
     def get_response(self) -> Response:
         for metric_name in project_metrics:
@@ -59,7 +76,6 @@ class Dashboard:
     @metric
     def done_tasks_count(self, widget_type: WidgetType) -> JSONObject:
         done_tasks = self.project_tasks.filter(
-            parent_task=None,
             status=Task.Status.DONE
         )
         return done_tasks.count()
@@ -73,31 +89,104 @@ class Dashboard:
 
     @metric
     def done_tasks_by_date(self, widget_type: WidgetType) -> JSONObject:
-        done_tasks = self.project_tasks.filter(
-            parent_task=None,
+        tasks = self.tasks_last_weeks.filter(
             status=Task.Status.DONE
         ).order_by("due_date")
 
-        grouped_tasks = {}
+        week_counts = [0 for _ in range(5)]
 
-        for task in done_tasks:
-            due_date = str(task.due_date)
-            if due_date not in grouped_tasks:
-                grouped_tasks[due_date] = []
-            grouped_tasks[due_date].append(task)
+        for task in tasks:
+            days_difference = (task.start_date - self.start_date).days
+            index = days_difference // 7
+            week_counts[index] += 1
 
-        if widget_type in (WidgetType.LINE, WidgetType.VERTICAL_BAR):
+        return [
+            {"name": label, "value": count}
+            for label, count in zip(self.last_weeks_labels, week_counts)
+        ]
+
+    @metric
+    def tasks_by_status(self, widget_type: WidgetType) -> JSONObject:
+        not_started_tasks = self.project_tasks.filter(
+            status=Task.Status.NOT_STARTED
+        ).count()
+
+        in_progress_tasks = self.project_tasks.filter(
+            status=Task.Status.IN_PROGRESS
+        ).count()
+
+        in_review_tasks = self.project_tasks.filter(
+            status=Task.Status.IN_REVIEW
+        ).count()
+
+        done_tasks = self.project_tasks.filter(
+            status=Task.Status.DONE
+        ).count()
+
+        labels = (
+            "No iniciado",
+            "En progreso",
+            "En revisión",
+            "Completado"
+        )
+
+        counts = (
+            not_started_tasks,
+            in_progress_tasks,
+            in_review_tasks,
+            done_tasks
+        )
+
+        if widget_type == WidgetType.HEAT_MAP:
+            max_count = max(value for _, value in counts)
             return [
-                {"date": key, "count": len(value)}
-                for key, value in grouped_tasks.items()
+                {"name": label, "value": count / max_count}
+                for label, count in zip(labels, counts)
             ]
         else:
-            # Heatmap
-            max_count = max(len(value) for value in grouped_tasks.values())
             return [
-                {"date": key, "count": len(value) / max_count}
-                for key, value in grouped_tasks.items()
+                {"name": label, "value": count}
+                for label, count in zip(labels, counts)
             ]
+
+    @metric
+    def tasks_by_priority(self, widget_type: WidgetType) -> JSONObject:
+        low_tasks = self.project_tasks.filter(
+            priority=Task.Priority.LOW
+        ).count()
+
+        medium_tasks = self.project_tasks.filter(
+            priority=Task.Priority.MEDIUM
+        ).count()
+
+        high_tasks = self.project_tasks.filter(
+            priority=Task.Priority.HIGH
+        ).count()
+
+        labels = (
+            "Baja",
+            "Media",
+            "Alta"
+        )
+
+        counts = (
+            low_tasks,
+            medium_tasks,
+            high_tasks
+        )
+
+        if widget_type == WidgetType.HEAT_MAP:
+            max_count = max(value for _, value in counts)
+            return [
+                {"name": label, "value": count / max_count}
+                for label, count in zip(labels, counts)
+            ]
+        else:
+            return [
+                {"name": label, "value": count}
+                for label, count in zip(labels, counts)
+            ]
+
     @metric
     def user_workload(self, widget_type: WidgetType) -> JSONObject:
         user_workload = {}
@@ -114,7 +203,7 @@ class Dashboard:
                     if assignee_name not in user_workload:
                         user_workload[assignee_name] = 0
                     user_workload[assignee_name] += 1
-                
+
 
             return [{"name": key, "value": value} for key, value in user_workload.items()]
         # Caso Vertical Bar o Horizontal Bar
@@ -127,6 +216,6 @@ class Dashboard:
                     user_workload[assignee_name] += 1
             return [{"name": key, "value": value} for key, value in user_workload.items()]
 
-        
 
-        
+
+
