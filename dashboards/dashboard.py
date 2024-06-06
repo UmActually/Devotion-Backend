@@ -65,6 +65,7 @@ class Dashboard:
 
     def get_response(self) -> Response:
         data: JSONObject = self.get_task_widgets()
+        data["name"] = self.project.name
 
         for metric_name in project_metrics:
             try:
@@ -252,3 +253,7 @@ class Dashboard:
                     user_workload[assignee_name] += 1
 
             return [{"name": key, "value": value} for key, value in user_workload.items()]
+
+    @metric
+    def project_progress(self, widget_type: WidgetType) -> JSONObject:
+        return self.project.progress
