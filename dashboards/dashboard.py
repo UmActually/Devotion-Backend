@@ -256,4 +256,4 @@ class Dashboard:
 
     @metric
     def project_progress(self, widget_type: WidgetType) -> JSONObject:
-        return self.project.progress
+        return {"name": self.project.name, "value": self.project.progress}
