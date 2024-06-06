@@ -129,15 +129,30 @@ class Dashboard:
 
         week_counts = [0 for _ in range(5)]
 
-        for task in tasks:
-            days_difference = (task.start_date - self.start_date).days
-            index = days_difference // 7
-            week_counts[index] += 1
+        if widget_type == WidgetType.LINE:
+            series = []
+            for task in tasks:
+                days_difference = (task.start_date - self.start_date).days
+                index = days_difference // 7
+                week_counts[index] += 1
 
-        return [
-            {"name": label, "value": count}
-            for label, count in zip(self.last_weeks_labels, week_counts)
-        ]
+            for label, count in zip(self.last_weeks_labels, week_counts):
+                series.append({"name": label, "value": count})
+
+            return [
+                {"name": "Completed Tasks", "series": series}
+            ]
+        
+        else:
+            for task in tasks:
+                days_difference = (task.start_date - self.start_date).days
+                index = days_difference // 7
+                week_counts[index] += 1
+
+            return [
+                {"name": label, "value": count}
+                for label, count in zip(self.last_weeks_labels, week_counts)
+            ]
 
     @metric
     def tasks_by_status(self, widget_type: WidgetType) -> JSONObject:
@@ -171,17 +186,10 @@ class Dashboard:
             done_tasks
         )
 
-        if widget_type == WidgetType.HEAT_MAP:
-            max_count = max(value for _, value in counts)
-            return [
-                {"name": label, "value": count / max_count}
-                for label, count in zip(labels, counts)
-            ]
-        else:
-            return [
-                {"name": label, "value": count}
-                for label, count in zip(labels, counts)
-            ]
+        return [
+            {"name": label, "value": count}
+            for label, count in zip(labels, counts)
+        ]
 
     @metric
     def tasks_by_priority(self, widget_type: WidgetType) -> JSONObject:
