@@ -26,7 +26,7 @@ def metric(func: Callable) -> Callable:
 
 
 class Dashboard:
-    USE_TEST_WIDGET_CONFIG = True
+    USE_TEST_WIDGET_CONFIG = False
     TEST_WIDGET_CONFIG = {
         "done_tasks_count": WidgetType.NUMBER,
         "all_done_tasks_count": WidgetType.NUMBER,
@@ -114,9 +114,9 @@ class Dashboard:
             status=Task.Status.DONE
         )
         return [{
-            "name" : "Tareas Completadas",
-            "value" : done_tasks.count()
-            }]
+            "name": "Tareas Completadas",
+            "value": done_tasks.count()
+        }]
 
     @metric
     def all_done_tasks_count(self, widget_type: WidgetType) -> JSONObject:
@@ -124,9 +124,9 @@ class Dashboard:
             status=Task.Status.DONE
         )
         return [{
-            "name" : "Tareas y subtareas completadas",
-            "value" : done_tasks.count()
-            }]
+            "name": "Tareas y subtareas completadas",
+            "value": done_tasks.count()
+        }]
 
     @metric
     def done_tasks_by_date(self, widget_type: WidgetType) -> JSONObject:
@@ -149,7 +149,7 @@ class Dashboard:
             return [
                 {"name": "Completed Tasks", "series": series}
             ]
-        
+
         else:
             for task in tasks:
                 days_difference = (task.start_date - self.start_date).days

@@ -43,8 +43,12 @@ def create_tree_item(
     while True:
         try:
             current_line = tree[current_line_index]
-            stripped_line = current_line.strip()
             indentation_level = get_indentation_level(current_line)
+            item_name = current_line.strip().split(":", maxsplit=1)
+            if len(item_name) == 1:
+                item_name, item_description = item_name[0], medium_lipsum
+            else:
+                item_name, item_description = item_name
         except IndexError:
             return
 
@@ -63,12 +67,12 @@ def create_tree_item(
             )
 
         # Proyecto
-        elif stripped_line.startswith("["):
-            item_name = stripped_line[1:-1]
+        elif item_name.startswith("["):
+            item_name = item_name[1:-1]
             project_id = api.create_project(
                 user_token=admin_token,
                 name=item_name,
-                description=medium_lipsum,
+                description=item_description,
                 leaders=(
                     [checo_perez_id]
                     if nest_level == 0 and checo_perez_id
@@ -78,7 +82,6 @@ def create_tree_item(
                 parent=parent_project
             )
             projects.append((project_id, item_name))
-            # noinspection PyUnusedLocal
             prev_line_item = project_id
             prev_line_is_task = False
             print(current_line)
@@ -87,12 +90,13 @@ def create_tree_item(
 
         # Tarea
         else:
-            start_date = fake.date_between('-2w', '+1M')
+            # start_date = fake.date_between('-2w', '+1M')
+            start_date = fake.date_between('-1M', '+2w')
             due_date = start_date + datetime.timedelta(days=randint(1, 60))
             task_id = api.create_task(
                 user_token=admin_token,
-                name=stripped_line,
-                description=short_lipsum,
+                name=item_name,
+                description=item_description,
                 assignee=choice(members),
                 start_date=start_date,
                 due_date=due_date,
@@ -100,8 +104,7 @@ def create_tree_item(
                 parent_project=parent_project,
                 parent_task=parent_task
             )
-            tasks.append((task_id, stripped_line))
-            # noinspection PyUnusedLocal
+            tasks.append((task_id, item_name))
             prev_line_item = task_id
             prev_line_is_task = True
             print(current_line)
