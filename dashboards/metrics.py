@@ -1,5 +1,6 @@
 from enum import IntEnum
 from typing import NamedTuple
+from devotion.serializers import camel_case
 
 
 class WidgetType(IntEnum):
@@ -12,6 +13,19 @@ class WidgetType(IntEnum):
     PIE = 5
     HEAT_MAP = 6
     GAUGE = 7
+
+
+def get_widget_type(name: str) -> WidgetType:
+    return {
+        "number": WidgetType.NUMBER,
+        "numbers": WidgetType.NUMBERS,
+        "vertical_bar": WidgetType.VERTICAL_BAR,
+        "horizontal_bar": WidgetType.HORIZONTAL_BAR,
+        "line": WidgetType.LINE,
+        "pie": WidgetType.PIE,
+        "heat_map": WidgetType.HEAT_MAP,
+        "gauge": WidgetType.GAUGE
+    }.get(name, WidgetType.NUMBER)
 
 
 class ProjectMetric(NamedTuple):
@@ -60,3 +74,5 @@ project_metrics: dict[str, ProjectMetric] = {
         (WidgetType.GAUGE,)
     )
 }
+
+# cc_metric_names = {camel_case(name): name for name in project_metrics.keys()}
