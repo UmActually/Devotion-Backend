@@ -113,14 +113,20 @@ class Dashboard:
         done_tasks = self.project_tasks.filter(
             status=Task.Status.DONE
         )
-        return done_tasks.count()
+        return [{
+            "name" : "Tareas Completadas",
+            "value" : done_tasks.count()
+            }]
 
     @metric
     def all_done_tasks_count(self, widget_type: WidgetType) -> JSONObject:
         done_tasks = self.project_subtasks.filter(
             status=Task.Status.DONE
         )
-        return done_tasks.count()
+        return [{
+            "name" : "Tareas y subtareas completadas",
+            "value" : done_tasks.count()
+            }]
 
     @metric
     def done_tasks_by_date(self, widget_type: WidgetType) -> JSONObject:
