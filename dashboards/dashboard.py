@@ -161,7 +161,7 @@ class Dashboard:
 
         week_counts = [0 for _ in range(5)]
 
-        if widget_type == W.LINE:
+        if widget_type in (W.LINE, W.HEAT_MAP):
             series = []
             for task in tasks:
                 days_difference = (task.start_date - self.start_date).days
