@@ -22,7 +22,15 @@ MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", 
 def metric(func: Callable) -> Callable:
     if func.__name__ not in project_metrics:
         raise ValueError(f"Unknown metric: {func.__name__}")
-    return func
+
+    def wrapper(self: 'Dashboard', widget_type: WidgetType) -> JSONObject:
+        resp = func(self, widget_type)
+        return {
+            "displayType": widget_type.value,
+            "data": resp
+        }
+
+    return wrapper
 
 
 class Dashboard:
