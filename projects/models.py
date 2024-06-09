@@ -2,6 +2,8 @@ import uuid
 from django.db import models
 from dashboards.metrics import project_metrics, WidgetType
 
+INT_BASE = len(WidgetType)
+
 
 def get_widget_configuration(config_number: int) -> dict[str, WidgetType]:
     """Convierte un número entero en una configuración de vistas de widgets."""
@@ -9,8 +11,8 @@ def get_widget_configuration(config_number: int) -> dict[str, WidgetType]:
     configuration = {}
 
     for metric_name in metrics:
-        widget_type = config_number % 8
-        config_number //= 8
+        widget_type = config_number % INT_BASE
+        config_number //= INT_BASE
         configuration[metric_name] = WidgetType(widget_type)
 
     return configuration
@@ -18,17 +20,17 @@ def get_widget_configuration(config_number: int) -> dict[str, WidgetType]:
 
 def get_config_number(configuration: dict[str, WidgetType]) -> int:
     """Convierte una configuración de vistas de widgets a un número entero."""
-    power_eight = 0
+    exponent = 0
     number = 0
 
     for name, widget_type in configuration.items():
-        number += widget_type * (8 ** power_eight)
-        power_eight += 1
+        number += widget_type * (INT_BASE ** exponent)
+        exponent += 1
 
     return number
 
 
-DEFAULT_WIDGET_CONFIG = get_config_number({
+DEFAULT_WIDGET_CONFIG = {
     "done_tasks_count": WidgetType.NUMBER,
     "all_done_tasks_count": WidgetType.NUMBER,
     "done_tasks_by_date": WidgetType.LINE,
@@ -37,7 +39,10 @@ DEFAULT_WIDGET_CONFIG = get_config_number({
     "user_workload": WidgetType.NUMBERS,
     "project_progress": WidgetType.GAUGE,
     "all_project_progress": WidgetType.GAUGE
-})
+}
+
+assert len(DEFAULT_WIDGET_CONFIG) == len(project_metrics), "La configuración de widgets no coincide con las métricas."
+DEFAULT_WIDGET_CONFIG = get_config_number(DEFAULT_WIDGET_CONFIG)
 
 
 class Project(models.Model):

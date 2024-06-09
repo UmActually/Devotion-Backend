@@ -37,7 +37,7 @@ urlpatterns = [
 
     path("projects/", projects.create_project),
     path("projects/<uuid:project_id>/", projects.ProjectView.as_view()),
-    path("projects/<uuid:project_id>/dashboard/", dashboards.get_project_dashboard),
+    path("projects/<uuid:project_id>/dashboard/", dashboards.DashboardView.as_view()),
 
     path("tasks/", tasks.create_task),
     path("tasks/<uuid:task_id>/", tasks.TaskView.as_view()),
