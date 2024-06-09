@@ -55,7 +55,7 @@ project_metrics: dict[str, ProjectMetric] = {
 
     "tasks_by_priority": ProjectMetric(
         "Tareas por prioridad",
-        (WidgetType.VERTICAL_BAR, WidgetType.HORIZONTAL_BAR, WidgetType.PIE, WidgetType.HEAT_MAP)
+        (WidgetType.VERTICAL_BAR, WidgetType.HORIZONTAL_BAR, WidgetType.PIE)
     ),
 
     "user_workload": ProjectMetric(
