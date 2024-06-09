@@ -1,6 +1,5 @@
 from enum import IntEnum
 from typing import NamedTuple
-from devotion.serializers import camel_case
 
 
 class WidgetType(IntEnum):

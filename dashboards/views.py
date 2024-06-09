@@ -22,6 +22,7 @@ class DashboardView(APIView):
         dashboard = Dashboard(project, request.user)
         return dashboard.get_response()
 
+    # TODO: Validar que el usuario sea miembro o líder del proyecto, quizás
     def put(self, request: Request, project_id: str) -> Response:
         try:
             project = Project.objects.get(id=project_id)
