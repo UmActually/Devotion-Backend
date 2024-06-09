@@ -7,10 +7,9 @@ INT_BASE = len(WidgetType)
 
 def get_widget_configuration(config_number: int) -> dict[str, WidgetType]:
     """Convierte un número entero en una configuración de vistas de widgets."""
-    metrics = list(project_metrics.keys())
     configuration = {}
 
-    for metric_name in metrics:
+    for metric_name in project_metrics():
         widget_type = config_number % INT_BASE
         config_number //= INT_BASE
         configuration[metric_name] = WidgetType(widget_type)
@@ -41,7 +40,7 @@ DEFAULT_WIDGET_CONFIG = {
     "all_project_progress": WidgetType.GAUGE
 }
 
-assert len(DEFAULT_WIDGET_CONFIG) == len(project_metrics), "La configuración de widgets no coincide con las métricas."
+assert len(DEFAULT_WIDGET_CONFIG) == len(project_metrics()), "La configuración de widgets no coincide con las métricas."
 DEFAULT_WIDGET_CONFIG = get_config_number(DEFAULT_WIDGET_CONFIG)
 
 

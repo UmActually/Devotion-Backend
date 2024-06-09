@@ -1,5 +1,4 @@
 from enum import IntEnum
-from typing import NamedTuple
 
 
 class WidgetType(IntEnum):
@@ -14,64 +13,25 @@ class WidgetType(IntEnum):
     GAUGE = 7
 
 
-def get_widget_type(name: str) -> WidgetType:
-    return {
-        "number": WidgetType.NUMBER,
-        "numbers": WidgetType.NUMBERS,
-        "vertical_bar": WidgetType.VERTICAL_BAR,
-        "horizontal_bar": WidgetType.HORIZONTAL_BAR,
-        "line": WidgetType.LINE,
-        "pie": WidgetType.PIE,
-        "heat_map": WidgetType.HEAT_MAP,
-        "gauge": WidgetType.GAUGE
-    }.get(name, WidgetType.NUMBER)
-
-
-class ProjectMetric(NamedTuple):
-    name: str
-    display_types: tuple[WidgetType, ...]
-
-
-project_metrics: dict[str, ProjectMetric] = {
-    "done_tasks_count": ProjectMetric(
-        "No. tareas completadas",
-        (WidgetType.NUMBER,)
-    ),
-
-    "all_done_tasks_count": ProjectMetric(
-        "No. tareas completadas (total)",
-        (WidgetType.NUMBER,)
-    ),
-
-    "done_tasks_by_date": ProjectMetric(
-        "Tareas completadas por fecha",
-        (WidgetType.LINE, WidgetType.VERTICAL_BAR, WidgetType.HEAT_MAP)
-    ),
-
-    "tasks_by_status": ProjectMetric(
-        "Tareas por estado",
-        (WidgetType.VERTICAL_BAR, WidgetType.HORIZONTAL_BAR, WidgetType.PIE)
-    ),
-
-    "tasks_by_priority": ProjectMetric(
-        "Tareas por prioridad",
-        (WidgetType.VERTICAL_BAR, WidgetType.HORIZONTAL_BAR, WidgetType.PIE, WidgetType.HEAT_MAP)
-    ),
-
-    "user_workload": ProjectMetric(
-        "Carga de trabajo de usuarios",
-        (WidgetType.NUMBERS, WidgetType.VERTICAL_BAR, WidgetType.HORIZONTAL_BAR, WidgetType.PIE, WidgetType.HEAT_MAP)
-    ),
-
-    "project_progress": ProjectMetric(
-        "Progreso del proyecto",
-        (WidgetType.GAUGE,)
-    ),
-
-    "all_project_progress": ProjectMetric(
-        "Progreso del proyecto (total)",
-        (WidgetType.GAUGE,)
-    )
+PROJECT_METRICS: dict[str, tuple[WidgetType, ...]] = {
+    "done_tasks_count": (),
+    "all_done_tasks_count": (),
+    "done_tasks_by_date": (),
+    "tasks_by_status": (),
+    "tasks_by_priority": (),
+    "user_workload": (),
+    "project_progress": (),
+    "all_project_progress": ()
 }
 
-# cc_metric_names = {camel_case(name): name for name in project_metrics.keys()}
+
+def project_metrics() -> list[str]:
+    return list(PROJECT_METRICS.keys())
+
+
+def set_display_types(metric_name: str, display_types: tuple[WidgetType, ...]) -> None:
+    PROJECT_METRICS[metric_name] = display_types
+
+
+def get_display_types(metric_name: str) -> tuple[WidgetType, ...]:
+    return PROJECT_METRICS[metric_name]
