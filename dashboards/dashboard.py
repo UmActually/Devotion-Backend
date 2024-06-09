@@ -38,7 +38,7 @@ class Dashboard:
     TEST_WIDGET_CONFIG = {
         "done_tasks_count": WidgetType.NUMBER,
         "all_done_tasks_count": WidgetType.NUMBER,
-        "done_tasks_by_date": WidgetType.LINE,
+        "done_tasks_by_date": WidgetType.HEAT_MAP,
         "tasks_by_status": WidgetType.VERTICAL_BAR,
         "tasks_by_priority": WidgetType.VERTICAL_BAR,
         "user_workload": WidgetType.HEAT_MAP,
@@ -144,7 +144,7 @@ class Dashboard:
 
         week_counts = [0 for _ in range(5)]
 
-        if widget_type == WidgetType.LINE:
+        if widget_type == WidgetType.LINE or widget_type == WidgetType.HEAT_MAP:
             series = []
             for task in tasks:
                 days_difference = (task.start_date - self.start_date).days
