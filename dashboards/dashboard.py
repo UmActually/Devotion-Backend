@@ -13,37 +13,51 @@ from projects.models import Project, get_widget_configuration
 from tasks.models import Task
 from tasks.subtasks import get_all_subtree
 from tasks.serializers import TaskDashboardSerializer
-from .metrics import WidgetType, project_metrics
+from .metrics import project_metrics, set_display_types
+from .metrics import WidgetType as W
+
 
 JSONObject = dict[str, Any] | list[Any] | int
-MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
 
-def metric(func: Callable) -> Callable:
-    if func.__name__ not in project_metrics:
-        raise ValueError(f"Unknown metric: {func.__name__}")
+class DashboardBadRequest(Exception):
+    pass
 
-    def wrapper(self: 'Dashboard', widget_type: WidgetType) -> JSONObject:
-        resp = func(self, widget_type)
-        return {
-            "displayType": widget_type.value,
-            "data": resp
-        }
 
-    return wrapper
+def metric(*display_types: W) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        if func.__name__ not in project_metrics():
+            raise ValueError(f"Unknown metric: {func.__name__}")
+        set_display_types(func.__name__, display_types)
+
+        def wrapper(self: 'Dashboard', widget_type: W) -> JSONObject:
+            if widget_type not in display_types:
+                raise DashboardBadRequest(
+                    f"El tipo de widget {widget_type} no es "
+                    f"válido para la métrica {func.__name__}.")
+
+            resp = func(self, widget_type)
+
+            return {
+                "displayType": widget_type.value,
+                "data": resp
+            }
+
+        return wrapper
+    return decorator
 
 
 class Dashboard:
     USE_TEST_WIDGET_CONFIG = False
     TEST_WIDGET_CONFIG = {
-        "done_tasks_count": WidgetType.NUMBER,
-        "all_done_tasks_count": WidgetType.NUMBER,
-        "done_tasks_by_date": WidgetType.HEAT_MAP,
-        "tasks_by_status": WidgetType.VERTICAL_BAR,
-        "tasks_by_priority": WidgetType.VERTICAL_BAR,
-        "user_workload": WidgetType.HEAT_MAP,
-        "project_progress": WidgetType.GAUGE,
-        "all_project_progress": WidgetType.GAUGE
+        "done_tasks_count": W.NUMBER,
+        "all_done_tasks_count": W.NUMBER,
+        "done_tasks_by_date": W.LINE,
+        "tasks_by_status": W.VERTICAL_BAR,
+        "tasks_by_priority": W.VERTICAL_BAR,
+        "user_workload": W.HEAT_MAP,
+        "project_progress": W.GAUGE,
+        "all_project_progress": W.GAUGE
     }
 
     def __init__(self, project: Project, user: User | AnonymousUser) -> None:
@@ -52,7 +66,7 @@ class Dashboard:
         self.project_tasks: QuerySet = project.tasks.filter(parent_task__isnull=True)
         self.project_subtasks: QuerySet = get_all_subtree(project)
 
-        self.configuration: dict[str, WidgetType] = self.TEST_WIDGET_CONFIG \
+        self.configuration: dict[str, W] = self.TEST_WIDGET_CONFIG \
             if self.USE_TEST_WIDGET_CONFIG else get_widget_configuration(project.widget_config)
 
         self.today = datetime.datetime.now(pytz.timezone("Mexico/General")).date()
@@ -68,20 +82,23 @@ class Dashboard:
             start_date = self.start_date + datetime.timedelta(days=i * 7)
             end_date = start_date + datetime.timedelta(days=6)
             self.last_weeks_labels.append(
-                f"{start_date.day} {MONTHS[start_date.month - 1]}"
-                f" - {end_date.day} {MONTHS[end_date.month - 1]}")
+                f"{start_date.strftime('%d/%m')} - {end_date.strftime('%d/%m')}")
 
     def get_response(self) -> Response:
         data: JSONObject = self.get_task_widgets()
         data["name"] = self.project.name
 
-        for metric_name in project_metrics:
+        for metric_name in project_metrics():
             try:
                 widget = getattr(self, metric_name)
             except AttributeError:
                 continue
 
-            resp = widget(self.configuration[metric_name])
+            try:
+                resp = widget(self.configuration[metric_name])
+            except DashboardBadRequest as e:
+                return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
             if resp is not None:
                 data[camel_case(metric_name)] = resp
 
@@ -116,8 +133,8 @@ class Dashboard:
 
     # Metric widgets
 
-    @metric
-    def done_tasks_count(self, widget_type: WidgetType) -> JSONObject:
+    @metric(W.NUMBER)
+    def done_tasks_count(self, widget_type: W) -> JSONObject:
         done_tasks = self.project_tasks.filter(
             status=Task.Status.DONE
         )
@@ -126,8 +143,8 @@ class Dashboard:
             "value": done_tasks.count()
         }]
 
-    @metric
-    def all_done_tasks_count(self, widget_type: WidgetType) -> JSONObject:
+    @metric(W.NUMBER)
+    def all_done_tasks_count(self, widget_type: W) -> JSONObject:
         done_tasks = self.project_subtasks.filter(
             status=Task.Status.DONE
         )
@@ -136,15 +153,15 @@ class Dashboard:
             "value": done_tasks.count()
         }]
 
-    @metric
-    def done_tasks_by_date(self, widget_type: WidgetType) -> JSONObject:
+    @metric(W.LINE, W.VERTICAL_BAR, W.HORIZONTAL_BAR, W.HEAT_MAP)
+    def done_tasks_by_date(self, widget_type: W) -> JSONObject:
         tasks = self.tasks_last_weeks.filter(
             status=Task.Status.DONE
         ).order_by("due_date")
 
         week_counts = [0 for _ in range(5)]
 
-        if widget_type == WidgetType.LINE or widget_type == WidgetType.HEAT_MAP:
+        if widget_type in (W.LINE, W.HEAT_MAP):
             series = []
             for task in tasks:
                 days_difference = (task.start_date - self.start_date).days
@@ -157,6 +174,7 @@ class Dashboard:
             return [
                 {"name": "Completed Tasks", "series": series}
             ]
+
         else:
             for task in tasks:
                 days_difference = (task.start_date - self.start_date).days
@@ -168,8 +186,8 @@ class Dashboard:
                 for label, count in zip(self.last_weeks_labels, week_counts)
             ]
 
-    @metric
-    def tasks_by_status(self, widget_type: WidgetType) -> JSONObject:
+    @metric(W.PIE, W.VERTICAL_BAR, W.HORIZONTAL_BAR, W.HEAT_MAP)
+    def tasks_by_status(self, widget_type: W) -> JSONObject:
         not_started_tasks = self.project_tasks.filter(
             status=Task.Status.NOT_STARTED
         ).count()
@@ -205,8 +223,8 @@ class Dashboard:
             for label, count in zip(labels, counts)
         ]
 
-    @metric
-    def tasks_by_priority(self, widget_type: WidgetType) -> JSONObject:
+    @metric(W.PIE, W.VERTICAL_BAR, W.HORIZONTAL_BAR, W.HEAT_MAP)
+    def tasks_by_priority(self, widget_type: W) -> JSONObject:
         low_tasks = self.project_tasks.filter(
             priority=Task.Priority.LOW
         ).count()
@@ -231,7 +249,7 @@ class Dashboard:
             high_tasks
         )
 
-        if widget_type == WidgetType.HEAT_MAP:
+        if widget_type == W.HEAT_MAP:
             max_count = max(value for _, value in counts)
             return [
                 {"name": label, "value": count / max_count}
@@ -243,12 +261,12 @@ class Dashboard:
                 for label, count in zip(labels, counts)
             ]
 
-    @metric
-    def user_workload(self, widget_type: WidgetType) -> JSONObject:
+    @metric(W.HEAT_MAP, W.PIE, W.VERTICAL_BAR, W.HORIZONTAL_BAR, W.NUMBERS)
+    def user_workload(self, widget_type: W) -> JSONObject:
         user_workload = {}
 
         # Caso Heat Map
-        if widget_type == WidgetType.HEAT_MAP:
+        if widget_type == W.HEAT_MAP:
             for task in self.tasks_last_weeks:
                 if str(task.assignee) not in user_workload:
                     user_workload[str(task.assignee)] = [
@@ -275,6 +293,6 @@ class Dashboard:
 
             return [{"name": key, "value": value} for key, value in user_workload.items()]
 
-    @metric
-    def project_progress(self, widget_type: WidgetType) -> JSONObject:
+    @metric(W.GAUGE)
+    def project_progress(self, widget_type: W) -> JSONObject:
         return [{"name": self.project.name, "value": self.project.progress}]

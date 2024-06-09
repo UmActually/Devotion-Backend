@@ -5,7 +5,7 @@ from rest_framework import status
 
 from projects.models import Project, get_config_number, get_widget_configuration
 from .dashboard import Dashboard
-from .metrics import WidgetType, project_metrics
+from .metrics import WidgetType, get_display_types
 
 
 def bad_request(message: str) -> Response:
@@ -32,7 +32,7 @@ class DashboardView(APIView):
         config = get_widget_configuration(project.widget_config)
         for metric_name, new_display_type_number in request.data.items():
             try:
-                metric = project_metrics[metric_name]
+                display_types = get_display_types(metric_name)
             except KeyError:
                 return bad_request("Una o más métricas no son válidas.")
 
@@ -41,7 +41,7 @@ class DashboardView(APIView):
             except ValueError:
                 return bad_request("Uno o más tipos de widgets no son válidos.")
 
-            if new_display_type not in metric.display_types:
+            if new_display_type not in display_types:
                 return bad_request(f"El tipo de widget {new_display_type} no es válido para la métrica {metric_name}.")
 
             config[metric_name] = WidgetType(new_display_type)
