@@ -45,7 +45,7 @@ project_metrics: dict[str, ProjectMetric] = {
 
     "done_tasks_by_date": ProjectMetric(
         "Tareas completadas por fecha",
-        (WidgetType.LINE, WidgetType.VERTICAL_BAR, WidgetType.HEAT_MAP)
+        (WidgetType.LINE, WidgetType.VERTICAL_BAR, WidgetType.HORIZONTAL_BAR, WidgetType.HEAT_MAP)
     ),
 
     "tasks_by_status": ProjectMetric(

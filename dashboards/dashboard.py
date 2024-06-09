@@ -157,7 +157,6 @@ class Dashboard:
             return [
                 {"name": "Completed Tasks", "series": series}
             ]
-
         else:
             for task in tasks:
                 days_difference = (task.start_date - self.start_date).days
