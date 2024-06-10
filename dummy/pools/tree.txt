@@ -1,87 +1,96 @@
-[FSAE 2024]
-    [Chasis]
-        Mejoras en el sistema de frenado
-        Diseño y pruebas de neumáticos
-        Diseño y componentes
-            Diseño del chasis
-            Investigación de nuevos materiales para la construcción del chasis
-            Fabricación de componentes de fibra de carbono
-        Peso y distribución
-            Optimización del peso del vehículo
-            Optimización de la distribución de peso
-        Aerodinámica
-            Investigación de aerodinámica
-            Investigación de mejoras aerodinámicas
-            Estudio de la aerodinámica en condiciones de lluvia
-            Pruebas de rendimiento en túnel de viento
-        Pruebas
-            Pruebas de choque
-            Pruebas de resistencia del chasis
-            Pruebas de resistencia de los materiales
-        [Cockpit]
-            Diseño del cockpit
-                Investigación de la ergonomía del cockpit
-                Pruebas de ergonomía del cockpit
-        [Alerón trasero]
-            DRS
-        [Dirección]
-            Desarrollo del sistema de dirección
-            Pruebas de rendimiento en pista
-            [Diferencial]
-                Investigación de tecnología de diferencial
-                Evaluación de sistemas de diferencial
-    [Electrónica]
-        Sistema de gestión del motor
-            Selección de motor
-            Análisis de rendimiento del motor
-            Configuración del sistema de gestión del motor
-        Sistema de telemetría
-            Diseño y configuración del sistema de telemetría
-            Programación del software de telemetría
-            Análisis de datos de rendimiento en pista
-        Sistema de control de tracción
-            Investigación de tecnología de control de tracción
-            Instalación de sistemas de control de tracción
-        Sistema de control de estabilidad
-            Investigación de tecnología de control de estabilidad
-            Implementación de sistemas de control de estabilidad
-        Sistema de detección de fallos
-            Investigación de sistemas de detección de fallos
-            Evaluación de sistemas de detección de fallos
-        Sistema de diagnóstico de averías
-            Investigación de sistemas de diagnóstico de averías
-            Evaluación de sistemas de diagnóstico de averías
-    [Suspensión]
-        Diseño de la suspensión
-            Investigación de suspensión
-            Optimización de la geometría de la suspensión
-        Configuración de la suspensión
-            Configuración de la suspensión delantera
-            Configuración de la suspensión trasera
-        Pruebas de rendimiento en pista
-            Simulaciones de rendimiento en pista
-            Pruebas de rendimiento en pista
-        Pruebas de fiabilidad del sistema de transmisión
-        Optimización de la geometría de la suspensión
-    [Finanzas]
-        Planificación financiera
-            Presupuesto
-            Financiación
-            Ingresos y gastos
-        Gestión de patrocinios
-            Gestión de patrocinios y relaciones públicas
-            Investigación de patrocinadores
-        [Eventos]
-            Organización de eventos de presentación
-            Organización de eventos de recaudación de fondos
-    [Marketing]
-        [Rebranding de FSAE]
-            Manual de identidad corporativa
-    [Motor]
-        [Proveedores]
-            Evaluación de proveedores de componentes
-            Junta de patrocinadores
-        Combustible y lubricantes
-            Investigación de combustible y lubricantes
-            Análisis de datos de consumo de combustible
-        Configuración del sistema de escape
+[FSAE 2024]:Ser la mejor escudería en al competencia SAE Formula Student con un vehículo monoplaza reconocido por nuestra excelencia en el diseño y construcción. Aspiramos a inspirar a las generaciones futuras demostrando que con pasión, determinación y trabajo en equipo podemos alcanzar nuestros objetivos en el mundo del automovilismo.
+    Evaluación de la competencia:Investigar criterios de evaluación de competencia, y que se necesita para competir.
+    Investigación de la competencia:Investigar competencias de FSAE y sus resultados, hacer comparativas y ver en que podemos mejorar.
+    Realización de objetivos:Establecer objetivos a corto y largo plazo, y como se van a cumplir.
+    Junta de patrocinadores:Reunión con patrocinadores para presentar objetivos y necesidades.
+    Junta con equipos de proyecto:Reunión con los equipos de proyecto para presentar objetivos y necesidades, para sacar adelante el proyecto.
+    [Chasis]:Equipo encargado de la estructura del vehículo. El objetivo es diseñar un chasis ligero y resistente que cumpla con las normativas de la competición.
+        Mejoras en el sistema de frenado:Investigación de sistemas de frenado de alto rendimiento para vehículos de competición.
+        Diseño y pruebas de neumáticos:Puesta a punto de neumáticos para competición, diseño de neumáticos de alto rendimiento teniendo en cuenta la aerodinámica y la resistencia al desgaste.
+        Diseño y componentes:Investigación de nuevos materiales para la construcción del chasis, fabricación de componentes de fibra de carbono.
+            Diseño del chasis:Diseñar un chasis que cumpla con las normativas de la competición y que sea ligero y resistente.
+            Investigación de nuevos materiales para la construcción del chasis:Investigación de materiales compuestos y aleaciones ligeras para la construcción del chasis.
+            Fabricación de componentes de fibra de carbono:Desarrollo de componentes de fibra de carbono para el chasis.
+        Peso y distribución:Optimización del peso del vehículo, optimización de la distribución de peso.
+            Optimización del peso del vehículo:Reducción del peso del vehículo sin comprometer la resistencia y la seguridad.
+            Optimización de la distribución de peso:Mejora de la distribución de peso para mejorar el rendimiento y la estabilidad.
+        Aerodinámica:Investigación de mejoras aerodinámicas, estudio de la aerodinámica en condiciones de lluvia.
+            Investigación de aerodinámica:Revisar y mejorar el diseño aerodinámico del vehículo.
+            Investigación de mejoras aerodinámicas:Investigación de mejoras en el diseño aerodinámico para aumentar la eficiencia y el rendimiento.
+            Estudio de la aerodinámica en condiciones de lluvia:Investigación de la aerodinámica del vehículo en condiciones de lluvia para mejorar la estabilidad y el rendimiento.
+            Pruebas de rendimiento en túnel de viento:Hacer pruebas con equipo de motor y chasis en túnel de viento.
+        Pruebas:Tarea para revisar las pruebas de choque, resistencia del chasis y resistencia de los materiales.
+            Pruebas de choque:Pruebas de impacto para evaluar la seguridad del vehículo, tener en cuenta la seguridad del piloto.
+            Pruebas de resistencia del chasis:Pruebas de resistencia del chasis para evaluar la resistencia y la durabilidad, tener en cuenta la seguridad del piloto.
+            Pruebas de resistencia de los materiales:Pruebas de resistencia de los materiales para evaluar la calidad y la durabilidad, tener en cuenta la seguridad del piloto.
+        [Cockpit]:Equipo encargado del diseño y ergonomía del cockpit. El objetivo es diseñar un cockpit cómodo y seguro para el piloto.
+            Diseño del cockpit:Diseño del cockpit para mejorar la ergonomía y la comodidad del piloto.
+                Investigación de la ergonomía del cockpit:Investigación de la ergonomía del cockpit para mejorar la comodidad y la seguridad del piloto.
+                Pruebas de ergonomía del cockpit:Pruebas de ergonomía del cockpit, avisar a equipo de Chasis si hay problemas.
+        [Alerón trasero]:Equipo encargado del diseño y pruebas del alerón trasero. El objetivo es diseñar un alerón trasero eficiente y ajustable.
+            DRS:Investigación de sistemas de alerón trasero ajustable para mejorar la eficiencia y el rendimiento.
+                Pruebas de rendimiento del DRS:Pruebas de rendimiento del DRS para evaluar la eficiencia y el rendimiento.
+        [Dirección]:Equipo encargado del sistema de dirección. El objetivo es desarrollar un sistema de dirección de alto rendimiento para vehículos de competición.
+            Desarrollo del sistema de dirección:Desarrollo de un sistema de dirección de alto rendimiento para vehículos de competición.
+            Investigación de sistemas de dirección:Investigación de sistemas de dirección de alto rendimiento para vehículos de competición.
+            Pruebas de rendimiento en pista:Pruebas de rendimiento en pista para evaluar la eficiencia y el rendimiento.
+            [Diferencial]:Equipo encargado del sistema de diferencial. El objetivo es desarrollar un sistema de diferencial de alto rendimiento para vehículos de competición.
+                Investigación de tecnología de diferencial:Referir a recursos en línea para investigar tecnología de diferencial.
+                Evaluación de sistemas de diferencial:Evaluar diferentes sistemas de diferencial para determinar el más adecuado.
+    [Electrónica]:Equipo encargado de la electrónica del vehículo. El objetivo es desarrollar un sistema de gestión del motor y un sistema de telemetría eficientes.
+        Sistema de gestión del motor:Investigación de sistemas de gestión del motor, selección de motor, análisis de rendimiento del motor, configuración del sistema de gestión del motor.
+            Selección de motor:Investigación de motores para competición, selección del motor más adecuado para el vehículo.
+            Análisis de rendimiento del motor:Análisis de rendimiento del motor para optimizar la configuración del sistema de gestión del motor.
+            Configuración del sistema de gestión del motor:Configuración del sistema de gestión del motor para optimizar el rendimiento y la eficiencia.
+        Sistema de telemetría:Investigación de sistemas de telemetría, diseño y configuración del sistema de telemetría, programación del software de telemetría, análisis de datos de rendimiento en pista.
+            Diseño y configuración del sistema de telemetría:Diseño y configuración del sistema de telemetría para recopilar y analizar datos de rendimiento en pista.
+            Programación del software de telemetría:Programación del software de telemetría para recopilar y analizar datos de rendimiento en pista. Realizarlo en Python.
+            Análisis de datos de rendimiento en pista:Analizar datos de rendimiento en pista para mejorar el rendimiento y la eficiencia.
+        Sistema de control de tracción:Investigación de tecnología de control de tracción, instalación de sistemas de control de tracción.
+            Investigación de tecnología de control de tracción:Investigar tecnología de control de tracción para mejorar el rendimiento y la seguridad.
+            Instalación de sistemas de control de tracción:Instalar sistemas de control de tracción para mejorar el rendimiento y la seguridad.
+        Sistema de control de estabilidad:Investigación de tecnología de control de estabilidad, implementación de sistemas de control de estabilidad.
+            Investigación de tecnología de control de estabilidad:Investigar tecnología de control de estabilidad para mejorar el rendimiento y la seguridad.
+            Implementación de sistemas de control de estabilidad:Implementar sistemas de control de estabilidad para mejorar el rendimiento y la seguridad.
+        Sistema de detección de fallos:Investigación de sistemas de detección de fallos, evaluación de sistemas de detección de fallos.
+            Investigación de sistemas de detección de fallos:Investigar sistemas de detección de fallos para mejorar la fiabilidad y la seguridad.
+            Evaluación de sistemas de detección de fallos:Evaluar sistemas de detección de fallos para mejorar la fiabilidad y la seguridad.
+        Sistema de diagnóstico de averías:Investigación de sistemas de diagnóstico de averías, evaluación de sistemas de diagnóstico de averías.
+            Investigación de sistemas de diagnóstico de averías:Investigar sistemas de diagnóstico de averías para mejorar la fiabilidad y la seguridad.
+            Evaluación de sistemas de diagnóstico de averías:Evaluar sistemas de diagnóstico de averías para mejorar la fiabilidad y la seguridad.
+    [Suspensión]:Equipo encargado de la suspensión del vehículo. El objetivo es desarrollar un sistema de suspensión eficiente y seguro.
+        Diseño de la suspensión:Investigación de sistemas de suspensión, diseño de la suspensión delantera y trasera, optimización de la geometría de la suspensión.
+            Investigación de suspensión:Investigar sistemas de suspensión para mejorar el rendimiento y la seguridad.
+            Optimización de la geometría de la suspensión:Optimizar la geometría de la suspensión para mejorar el rendimiento y la seguridad.
+        Configuración de la suspensión:Configuración de la suspensión delantera y trasera, pruebas de rendimiento en pista, pruebas de fiabilidad
+            Configuración de la suspensión delantera:Configuración de la suspensión delantera para mejorar el rendimiento y la seguridad.
+            Configuración de la suspensión trasera:Configuración de la suspensión trasera para mejorar el rendimiento y la seguridad.
+        Pruebas de rendimiento en pista:Simulaciones de rendimiento en pista, pruebas de rendimiento en pista.
+            Simulaciones de rendimiento en pista:Simulaciones de rendimiento en pista para evaluar el rendimiento y la eficiencia.
+            Pruebas de rendimiento en pista:Pruebas de rendimiento en pista para evaluar el rendimiento y la eficiencia. Reunirse con los demás equipo para ver los resultados.
+        Pruebas de fiabilidad del sistema de transmisión:Pruebas de fiabilidad del sistema de transmisión para evaluar la durabilidad y la seguridad. Para ver si hay problemas en la transmisión.
+        Optimización de la geometría de la suspensión:Optimización de la geometría de la suspensión para mejorar el rendimiento y la seguridad. Para ver si hay problemas en la suspensión.
+    [Finanzas]:Equipo encargado de la planificación financiera y la gestión de patrocinios. El objetivo es asegurar la financiación del proyecto y atraer patrocinadores.
+        Planificación financiera:Presupuesto, financiación, ingresos y gastos.
+            Presupuesto:Establecer un presupuesto para el proyecto, tener en cuenta los costes y los ingresos.
+            Financiación:Buscar financiación para el proyecto, tener en cuenta los costes y los ingresos.
+            Ingresos y gastos:Registrar los ingresos y los gastos del proyecto, tener en cuenta los costes y los ingresos.
+        Gestión de patrocinios:Investigación de patrocinadores, gestión de patrocinios y relaciones públicas.
+            Gestión de patrocinios y relaciones públicas:Gestión de patrocinios y relaciones públicas para promocionar el proyecto y atraer patrocinadores.
+            Investigación de patrocinadores:Investigar patrocinadores que sean adecuados para el proyecto, tener en cuenta los costes y los ingresos.
+        [Eventos]: Apartado creado para la organización de eventos de presentación y recaudación de fondos.
+            Organización de eventos de presentación:Realizar planeación de eventos de presentación para atraer patrocinadores.
+            Organización de eventos de recaudación de fondos:Realizar planeación de eventos de recaudación de fondos para financiar el proyecto.
+    [Marketing]:Equipo encargado de la promoción y difusión del proyecto. El objetivo es dar a conocer el proyecto y atraer patrocinadores.
+        [Rebranding de FSAE]:Apartado creado para el rebranding de FSAE.
+            Manual de identidad corporativa:Modificar el manual de identidad corporativa de FSAE. Agregar la nueva paleta de colores y tipografía.
+    [Motor]:Equipo encargado del motor del vehículo. El objetivo es desarrollar un motor de alto rendimiento y eficiencia.
+        [Proveedores]:Apartado creado para la evaluación de proveedores de componentes.
+            Evaluación de proveedores de componentes:Preparar una presentación para evaluar proveedores de componentes.
+            Junta de patrocinadores:Reunión con patrocinadores para presentar objetivos y necesidades.
+        Combustible y lubricantes:Investigación de combustible y lubricantes, análisis de datos de consumo de combustible.
+            Investigación de combustible y lubricantes:Investigar combustible y lubricantes para mejorar el rendimiento y la eficiencia.
+            Análisis de datos de consumo de combustible:Analizar datos de consumo de combustible para mejorar el rendimiento y la eficiencia.
+        Configuración del sistema de escape:Investigación de sistemas de escape, diseño y configuración del sistema de escape, pruebas de rendimiento en pista.
+            Diseño y configuración del sistema de escape:Diseño y configuración del sistema de escape para mejorar el rendimiento y la eficiencia.
+            Pruebas de rendimiento en pista:Pruebas de rendimiento en pista para evaluar el rendimiento y la eficiencia.
