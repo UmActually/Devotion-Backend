@@ -112,6 +112,8 @@ def handle_subtasks_response(
     else:
         table_view_type(response, tasks)
 
+    response["view"] = view_type
+
 
 def handle_global_calendar_response(request: Request, response: JSONObject) -> None:
     user = request.user

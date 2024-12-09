@@ -4,8 +4,9 @@ import getpass
 from time import sleep
 from random import randint, choice, sample, shuffle
 import faker
-import api
 
+import api
+from api import HTTPException
 
 admin_token = ""
 
@@ -163,13 +164,16 @@ def regenerate_task_dates() -> None:
     all_tasks = data["tasks"]
     shuffle(all_tasks)
     for task_id, name in all_tasks:
-        start_date = fake.date_between('-2w', '+1M')
+        start_date = fake.date_between('-5w', '+2w')
         due_date = start_date + datetime.timedelta(days=randint(1, 60))
-        api.update_task_dates(admin_token, task_id, start_date, due_date)
-        print(name, start_date, due_date)
+        try:
+            api.update_task_dates(admin_token, task_id, due_date, start_date)
+            print(name, start_date, due_date)
+        except HTTPException as e:
+            print(e)
         sleep(1.5)
 
 
 if __name__ == "__main__":
-    populate_fsae_friendly()
-    # regenerate_task_dates()
+    # populate_fsae_friendly()
+    regenerate_task_dates()

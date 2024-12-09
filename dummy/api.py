@@ -131,7 +131,7 @@ def create_task_(
 def update_task_dates(
         user_token: str, task_id: str, due_date: datetime.date,
         start_date: datetime.date | None = None) -> str:
-    endpoint = f"tasks/{task_id}"
+    endpoint = f"tasks/{task_id}/"
 
     r = requests.put(BASE_URL + endpoint, headers={
         "Authorization": "Bearer " + user_token
