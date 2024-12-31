@@ -92,6 +92,7 @@ def handle_subtasks_response(
         request: Request, response: JSONObject, project_or_task: Project | Task) -> None:
 
     is_task = isinstance(project_or_task, Task)
+    verbose_typing = request.query_params.get("typing", "false") == "true"
     view_type = request.query_params.get("view", "table")
     get_subtree = request.query_params.get("subtree", "false") == "true"
     filter_assigned = request.query_params.get("assigned", "false") == "true"
@@ -112,7 +113,13 @@ def handle_subtasks_response(
     else:
         table_view_type(response, tasks)
 
-    response["view"] = view_type
+    # response["view"] = view_type
+
+    if verbose_typing:
+        response["tasks"] = {
+            "type": view_type,
+            "data": response["tasks"]
+        }
 
 
 def handle_global_calendar_response(request: Request, response: JSONObject) -> None:
