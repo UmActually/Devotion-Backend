@@ -84,7 +84,6 @@ class TaskView(APIView):
         except Task.DoesNotExist:
             return Response({"message": "Tarea no encontrada."}, status=status.HTTP_404_NOT_FOUND)
 
-        verbose_typing = request.query_params.get("typing", "false") == "true"
         response_fields = request.query_params.get("get", "all")
         response = {}
 
@@ -96,12 +95,6 @@ class TaskView(APIView):
 
         if response_fields in ("tasks", "all"):
             handle_subtasks_response(request, response, task)
-
-        if verbose_typing:
-            response = {
-                "type": "task",
-                "data": response
-            }
 
         return Response(response, status=status.HTTP_200_OK)
 

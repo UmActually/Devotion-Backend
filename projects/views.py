@@ -67,7 +67,6 @@ class ProjectView(APIView):
         except Project.DoesNotExist:
             return Response({"message": "Proyecto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-        verbose_typing = request.query_params.get("typing", "false") == "true"
         response_fields = request.query_params.get("get", "all")
         response = {}
 
@@ -86,12 +85,6 @@ class ProjectView(APIView):
 
         if response_fields in ("tasks", "all"):
             handle_subtasks_response(request, response, project)
-
-        if verbose_typing:
-            response = {
-                "type": "project",
-                "data": response
-            }
 
         return Response(response, status=status.HTTP_200_OK)
 
