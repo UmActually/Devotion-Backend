@@ -92,7 +92,7 @@ def handle_subtasks_response(
         request: Request, response: JSONObject, project_or_task: Project | Task) -> None:
 
     is_task = isinstance(project_or_task, Task)
-    verbose_typing = request.query_params.get("typing", "false") == "true"
+    is_ios = request.query_params.get("platform", "web") == "ios"
     view_type = request.query_params.get("view", "table")
     get_subtree = request.query_params.get("subtree", "false") == "true"
     filter_assigned = request.query_params.get("assigned", "false") == "true"
@@ -107,15 +107,16 @@ def handle_subtasks_response(
             tasks = tasks.filter(assignee_id=assignee_id)
 
     if view_type == "calendar":
-        calendar_view_type(response, tasks)
+        if is_ios:
+            table_view_type(response, tasks)
+        else:
+            calendar_view_type(response, tasks)
     elif view_type == "kanban":
         kanban_view_type(response, tasks)
     else:
         table_view_type(response, tasks)
 
-    # response["view"] = view_type
-
-    if verbose_typing:
+    if is_ios:
         response["tasks"] = {
             "type": view_type,
             "data": response["tasks"]
